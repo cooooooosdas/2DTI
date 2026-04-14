@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <title>2DTI - 次元人格测试</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="./imagesBase64.js"></script>
+    <style>
+        :root {
+            --bg-gradient-1: #f7f0ff;
+            --bg-gradient-2: #ffd6f4;
+            --bg-gradient-3: #bde8ff;
+            --card-bg: rgba(255, 255, 255, 0.82);
+            --text-main: #2f2a45;
+            --text-sub: #6e6690;
+            --primary: #ff5fb2;
+            --primary-hover: #ff2f9f;
+            --primary-light: #ffe3f5;
+            --accent: #7c6dff;
+            --accent-2: #45c8ff;
+            --glass-blur: 12px;
+            --shadow-sm: 0 6px 18px rgba(124, 109, 255, 0.14);
+            --shadow-md: 0 12px 34px rgba(124, 109, 255, 0.2);
+            --shadow-lg: 0 24px 56px rgba(124, 109, 255, 0.24);
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-full: 999px;
+            --transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+            background:
+                radial-gradient(circle at 10% 15%, rgba(124,109,255,0.25), transparent 32%),
+                radial-gradient(circle at 88% 20%, rgba(69,200,255,0.24), transparent 34%),
+                radial-gradient(circle at 52% 88%, rgba(255,95,178,0.22), transparent 36%),
+                linear-gradient(140deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 52%, var(--bg-gradient-3) 100%);
+            background-attachment: fixed;
+            position: relative;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .brand-watermark {
+            position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 16px;
+            font-family: "Courier New", Courier, monospace; font-weight: 900; font-size: 16px;
+            color: var(--primary-hover); letter-spacing: 2px; opacity: 0.6; z-index: 100;
+        }
+        .bg-decorations { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .particle { position: absolute; background: rgba(255, 255, 255, 0.6); border-radius: 50%; animation: floatUp linear infinite; }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-20vh) scale(1.2) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            width: 100%; max-width: 480px; min-height: 100vh; min-height: 100dvh;
+            padding: max(14px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom));
+            display: flex; flex-direction: column; position: relative; z-index: 1;
+        }
+        @media (min-width: 900px) {
+            .container {
+                padding-top: 56px;
+            }
+        }
+        body.theme-night {
+            --bg-gradient-1: #161a2f;
+            --bg-gradient-2: #221a3f;
+            --bg-gradient-3: #152a45;
+            --card-bg: rgba(27, 33, 58, 0.68);
+            --text-main: #e8ecff;
+            --text-sub: #a8b3d8;
+            --primary: #ff6ebc;
+            --primary-hover: #ff8ccf;
+            --primary-light: rgba(255, 110, 188, 0.18);
+            --accent: #8a96ff;
+            --accent-2: #52d1ff;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.35);
+            --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.42);
+            --shadow-lg: 0 26px 54px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid rgba(255,255,255,0.85);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(120deg, rgba(255,255,255,0.28), transparent 35%, transparent 65%, rgba(255,255,255,0.2));
+            z-index: 0;
+        }
+        .glass-card > * {
+            position: relative;
+            z-index: 1;
+        }
+        .page { display: none; flex-direction: column; width: 100%; padding-bottom: 20px; animation: fadeInScale 0.4s ease; }
+        .page.active { display: flex; }
+        @keyframes fadeInScale { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        .slide-out-left { animation: slideOutLeft 0.28s ease forwards; }
+        .slide-in-right { animation: slideInRight 0.28s ease forwards; }
+        @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-50px); opacity: 0; } }
+        @keyframes slideInRight { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        #start-page { justify-content: center; align-items: center; min-height: 88dvh; text-align: center; }
+        .title-ribbon {
+            background: linear-gradient(120deg, var(--primary), var(--accent)); color: white; padding: 8px 22px; border-radius: var(--radius-full);
+            font-size: 13px; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px; box-shadow: var(--shadow-sm);
+        }
+        .start-icon { font-size: 60px; color: var(--primary); margin-bottom: 16px; filter: drop-shadow(0 10px 15px rgba(255,126,179,0.35)); }
+        .start-title {
+            font-size: 26px; font-weight: 900; margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--primary-hover), var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .start-desc { font-size: 14px; color: var(--text-sub); line-height: 1.75; margin-bottom: 28px; padding: 0 12px; }
+        .btn-group-row { display: flex; gap: 12px; width: 100%; flex-direction: column; align-items: center; }
+        .btn-primary, .btn-outline {
+            width: 100%; min-height: 48px; border-radius: var(--radius-full); font-weight: bold; cursor: pointer;
+            transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; border: none;
+            padding: 14px 16px; font-size: 16px; box-shadow: 0 10px 20px rgba(255, 126, 179, 0.25);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 26px rgba(124,109,255,0.32); }
+        .btn-outline {
+            background: rgba(255,255,255,0.72); color: var(--accent); border: 1px solid rgba(255,255,255,0.9);
+            padding: 12px 14px; font-size: 15px; box-shadow: var(--shadow-sm);
+        }
+        .btn-primary:active, .btn-outline:active { transform: scale(0.98); }
+
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-top: 2px; }
+        .nav-btn {
+            width: 42px; height: 42px; border-radius: 50%; border: 1px solid #fff; background: rgba(255,255,255,0.85);
+            color: var(--accent); display: flex; justify-content: center; align-items: center; font-size: 16px;
+            cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);
+        }
+        .nav-btn:disabled { color: #ccc; border-color: transparent; box-shadow: none; cursor: not-allowed; opacity: 0.5; }
+        .progress-wrapper { flex: 1; margin: 0 12px; text-align: center; position: relative; }
+        .progress-text { font-size: 13px; color: var(--primary-hover); font-weight: 900; margin-bottom: 8px; }
+        .track-container { width: 100%; height: 10px; background: rgba(255,255,255,0.5); border-radius: var(--radius-full); border: 1px solid #fff; }
+        .track-fill { height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--primary)); width: 0%; border-radius: var(--radius-full); transition: width 0.35s ease; }
+        .track-animal { position: absolute; top: -17px; left: 0%; transform: translateX(-50%); font-size: 20px; transition: left 0.35s ease; }
+        .question-card { padding: 28px 16px 22px; margin-bottom: 16px; margin-top: 8px; }
+        .glass-card.question-card { overflow: visible; }
+        .q-badge {
+            position: absolute; top: -13px; left: 18px; background: linear-gradient(135deg, var(--accent), var(--primary)); color: #fff;
+            padding: 4px 12px; border-radius: 10px; border: 2px solid #fff; font-size: 13px; font-weight: 900;
+        }
+        .question-text { font-size: 17px; line-height: 1.55; font-weight: bold; margin-top: 8px; }
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn {
+            background: rgba(255,255,255,0.76); border: 1px solid rgba(255,255,255,0.95); padding: 13px 12px; border-radius: var(--radius-md);
+            font-size: 15px; line-height: 1.45; color: var(--text-main); cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .option-prefix {
+            width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light); color: var(--primary-hover);
+            display: flex; justify-content: center; align-items: center; font-weight: 900; margin-right: 10px; flex-shrink: 0; font-size: 13px;
+        }
+        .option-btn.selected { border-color: var(--accent); background: linear-gradient(135deg, rgba(124,109,255,0.12), rgba(255,95,178,0.14)); box-shadow: 0 6px 18px rgba(124,109,255,0.24); }
+        .option-btn.selected .option-prefix { background: var(--primary); color: #fff; }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.52); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center; z-index: 100; opacity: 0; transition: opacity .25s;
+            padding: 14px;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .answer-card-modal {
+            background: rgba(255,255,255,0.96); width: 100%; max-width: 440px; border-radius: var(--radius-lg); padding: 22px 16px;
+            border: 2px solid #fff; box-shadow: var(--shadow-lg);
+        }
+        .ac-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .ac-title { font-weight: 900; color: var(--primary-hover); font-size: 19px; }
+        .ac-close { background: #f0f0f0; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; }
+        .ac-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+        .ac-item {
+            aspect-ratio: 1; border-radius: 10px; border: 2px solid #fff; display: flex; justify-content: center; align-items: center;
+            box-shadow: var(--shadow-sm); font-size: 14px; font-weight: bold; color: var(--text-sub); cursor: pointer; background: rgba(255,255,255,0.65);
+        }
+        .ac-item.answered { background: var(--primary-light); color: var(--primary-hover); border-color: transparent; }
+        .ac-item.current { border: 2px solid var(--primary); transform: scale(1.08); background: #fff; z-index: 2; }
+
+        .archive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-height: 58vh; overflow-y: auto; padding-right: 4px; }
+        .archive-item { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.85); border: 2px solid #fff; border-radius: 14px; padding: 10px 6px; box-shadow: var(--shadow-sm); }
+        .archive-item.rare { border-color: var(--accent); background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(177, 133, 219, 0.1)); }
+        .archive-avatar-box { width: 58px; height: 58px; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 6px; border: 2px solid #fff; }
+        .archive-avatar-box img { width: 100%; height: 100%; object-fit: contain; animation: avatarFloat 3.4s ease-in-out infinite; transform-origin: center bottom; }
+        .archive-name { font-size: 12px; font-weight: 900; width: 100%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+        .archive-tag { font-size: 11px; color: #fff; background: var(--primary); padding: 2px 7px; border-radius: 10px; font-weight: bold; }
+
+        .result-subtitle { text-align: center; font-size: 14px; font-weight: bold; color: var(--text-sub); margin-bottom: 5px; }
+        .result-title-main { text-align: center; font-size: 28px; font-weight: 900; color: var(--primary-hover); margin-bottom: 14px; }
+        .result-title-main.rare {
+            color: var(--accent); background: linear-gradient(135deg, var(--accent), var(--primary));
+            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .character-hero { text-align: center; padding: 26px 14px 20px; margin-bottom: 16px; overflow: hidden; }
+        .avatar-box {
+            width: 98px; height: 98px; margin: 0 auto 12px; border-radius: 26px; background: #fff; border: 4px solid #fff;
+            box-shadow: var(--shadow-lg); display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+        .avatar-box img { width: 100%; height: 100%; object-fit: contain; border-radius: 22px; animation: avatarFloat 2.8s ease-in-out infinite; transform-origin: center bottom; }
+        @keyframes avatarFloat {
+            0%, 100% { transform: translateY(0) rotate(-1.2deg) scale(1); }
+            25% { transform: translateY(-1px) rotate(0.8deg) scale(1.01); }
+            50% { transform: translateY(-2px) rotate(1.6deg) scale(1.012); }
+            75% { transform: translateY(-1px) rotate(-0.6deg) scale(1.006); }
+        }
+        .char-name { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+        .char-anime { font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: 10px; }
+        .char-tag { font-size: 12px; background: var(--primary); color: #fff; padding: 5px 12px; border-radius: var(--radius-full); display: inline-block; margin-bottom: 10px; font-weight: bold; }
+        .char-tag.rare { background: var(--accent); }
+        .char-similarity {
+            font-size: 14px; color: var(--primary-hover); font-weight: 900; margin-bottom: 10px; display: inline-flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.95); padding: 5px 12px; border-radius: var(--radius-full); border: 2px solid #fff; box-shadow: var(--shadow-sm);
+        }
+        .char-similarity.rare { color: var(--accent); }
+        .char-tags-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .hobby-tag {
+            background: rgba(255,126,179,.15); color: var(--primary-hover); padding: 4px 10px; border-radius: 18px; font-size: 12px; font-weight: bold; border: 1px solid rgba(255,126,179,.3);
+        }
+        .hobby-tag.rare { background: rgba(177,133,219,.15); color: var(--accent); border-color: rgba(177,133,219,.3); }
+        .char-roast {
+            font-size: 14px; line-height: 1.7; text-align: justify; background: rgba(255,255,255,.65); padding: 14px; border-radius: var(--radius-md);
+            border: 2px dashed var(--primary-light);
+        }
+        .char-roast::before { content: "🔥 2DTI 今日嘴替"; display: block; text-align: center; font-weight: 900; color: var(--primary-hover); margin-bottom: 8px; }
+        .analysis-card { padding: 16px 14px; margin-bottom: 16px; }
+        .analysis-title { text-align: center; font-size: 16px; font-weight: 900; color: var(--accent); margin-bottom: 10px; }
+        .analysis-p { font-size: 14px; line-height: 1.7; color: var(--text-main); margin-bottom: 10px; }
+        .rank-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 12px; }
+        .rank-item {
+            background: rgba(255,255,255,0.75); border: 1px solid #fff; border-radius: 12px; padding: 9px 10px;
+            display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold;
+        }
+        .rank-left { color: var(--text-main); }
+        .rank-right { color: var(--accent); }
+        .chuuni-box {
+            background: linear-gradient(135deg, rgba(124,109,255,0.18), rgba(255,95,178,0.16));
+            border: 1px solid rgba(124,109,255,0.35);
+            border-radius: 12px;
+            padding: 12px;
+            color: #4f3f73;
+            font-size: 14px;
+            line-height: 1.65;
+            font-weight: 900;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 12px;
+        }
+        .chuuni-box::before {
+            content: "⚡ 中二语录";
+            display: block;
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 6px;
+            letter-spacing: .5px;
+        }
+        .stats-container { padding: 20px 12px; margin-bottom: 16px; }
+        .stats-title { font-size: 16px; color: var(--primary-hover); margin-bottom: 10px; font-weight: 900; text-align: center; }
+        .radar-container { position: relative; width: 100%; height: 220px; display: flex; justify-content: center; }
+        .brand-slogan { text-align: center; color: var(--text-sub); font-size: 12px; font-weight: bold; margin-bottom: 14px; }
+        .display-settings {
+            position: fixed;
+            right: 14px;
+            bottom: calc(18px + env(safe-area-inset-bottom));
+            z-index: 1200;
+            width: 210px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.85);
+            border-radius: 14px;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            padding: 10px;
+            transform: translateY(8px) scale(0.98);
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+        .display-settings.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+        .display-settings-title { font-size: 12px; font-weight: 900; color: var(--accent); margin-bottom: 8px; }
+        .settings-row { margin-bottom: 10px; }
+        .settings-row:last-child { margin-bottom: 2px; }
+        .settings-label { font-size: 12px; color: var(--text-sub); margin-bottom: 4px; display: block; font-weight: bold; }
+        .settings-toggle {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: #fff;
+            padding: 8px 10px;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .settings-range { width: 100%; accent-color: var(--accent); }
+        .settings-btn {
+            position: fixed;
+            right: 14px;
+            bottom: calc(18px + env(safe-area-inset-bottom));
+            z-index: 1201;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.9);
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+        .settings-btn.hidden { opacity: 0; pointer-events: none; }
+        .result-reveal {
+            opacity: 0;
+            transform: translateY(14px) scale(0.98);
+            transition: opacity .42s ease, transform .42s ease;
+        }
+        .result-reveal.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .avatar-box.intro-pop {
+            animation: avatarIntro .58s cubic-bezier(0.2, 1, 0.3, 1) both;
+        }
+        @keyframes avatarIntro {
+            0% { opacity: 0; transform: translateY(12px) scale(0.72); }
+            70% { opacity: 1; transform: translateY(-3px) scale(1.04); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .loading-screen { flex-direction: column; background: var(--bg-gradient-1); z-index: 2000; }
+        .magic-circle { font-size: 56px; color: var(--primary); margin-bottom: 16px; animation: spin 2.5s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .poster-modal-content {
+            background: transparent; width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; max-height: 95dvh;
+        }
+        .poster-img-container {
+            width: 100%; border-radius: 18px; overflow-y: auto; overflow-x: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            margin-bottom: 10px; background: #fff; border: 3px solid #fff;
+        }
+        .poster-img-container img { width: 100%; display: block; }
+        .poster-tip { color: #fff; font-size: 14px; text-shadow: 0 2px 8px rgba(0,0,0,0.8); font-weight: bold; letter-spacing: 1px; }
+        .close-poster-btn {
+            margin-top: 10px; background: rgba(255,255,255,0.3); border: 2px solid #fff; color: #fff; backdrop-filter: blur(4px);
+            width: 48px; height: 48px; border-radius: 50%; font-size: 22px; cursor: pointer;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="brand-watermark">2DTI</div>
+<div class="bg-decorations" id="bg-decorations"></div>
+
+<div class="container">
+    <div id="start-page" class="page active">
+        <div class="title-ribbon">NEW! 第二世代人格算法</div>
+        <i class="fa-solid fa-ghost start-icon"></i>
+        <h1 id="start-title-trigger" class="start-title">2DTI · 测测你的二次元灵魂原型</h1>
+        <div class="start-desc glass-card" style="padding: 16px; border-radius: 16px;">
+            <p style="font-weight:bold; color:var(--primary-hover); margin-bottom:8px;">基于赛博心理学与抽象梗学</p>
+            <p>测绘你的灵魂纯度！包含经典四维与隐藏第五维度。</p>
+            <p style="margin-top: 10px; background: #fff; padding: 8px; border-radius:8px; display:inline-block;"><b style="color:var(--accent)">【W稳如老狗 / D癫狂发疯】</b></p>
+            <p style="margin-top: 10px; font-size:13px; font-weight:bold; color: var(--accent);">32种形态 + 3个深渊彩蛋。</p>
+        </div>
+        <div class="btn-group-row">
+            <button class="btn-primary" onclick="startTest()"><i class="fa-solid fa-gamepad"></i> 建立神经连接</button>
+            <button class="btn-outline" onclick="showShareModal()"><i class="fa-solid fa-paper-plane"></i> 召唤次元搭子</button>
+        </div>
+        <div style="margin-top: 18px; font-size: 13px; color: var(--text-sub); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; font-weight: bold;" onclick="openArchiveModal()">
+            <i class="fa-solid fa-book-journal-whills"></i> 📜 2DTI 图鉴：已收集 <span id="home-unlock-count">0</span>/<span id="home-total-count">32</span>
+        </div>
+    </div>
+
+    <div id="question-page" class="page">
+        <div class="top-nav">
+            <button class="nav-btn" id="btn-prev" onclick="goToPrev()"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="progress-wrapper">
+                <div class="progress-text" id="progress-text">1 / 30</div>
+                <div class="track-container">
+                    <div id="progress-bar" class="track-fill"></div>
+                    <div id="progress-animal" class="track-animal">🐈</div>
+                </div>
+            </div>
+            <button class="nav-btn" onclick="toggleAnswerCard()"><i class="fa-solid fa-bars-staggered"></i></button>
+        </div>
+        <div id="question-content-area">
+            <div class="glass-card question-card">
+                <div class="q-badge" id="q-badge">Q.1</div>
+                <div id="question-text" class="question-text">加载中...</div>
+            </div>
+            <div id="options-container" class="options-list"></div>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="modal-overlay loading-screen">
+        <i class="fa-solid fa-fan magic-circle"></i>
+        <div class="loading-text">2DTI 灵魂解析中...</div>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="answer-card-modal">
+            <div class="ac-header"><span class="ac-title">2DTI 档案</span><button class="ac-close" onclick="toggleAnswerCard()"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="ac-grid" id="ac-grid"></div>
+            <button class="btn-primary" style="width: 100%; border-radius:12px;" onclick="checkAndSubmit()">封存记忆，开始鉴定</button>
+        </div>
+    </div>
+
+    <div id="archive-modal" class="modal-overlay" style="z-index: 1000;">
+        <div class="answer-card-modal" style="max-width: 440px;">
+            <div class="ac-header">
+                <span class="ac-title" style="margin:0 auto; padding-left: 36px;">📜 2DTI 图鉴 (<span id="modal-unlock-count">0</span>/<span id="modal-total-count">32</span>)</span>
+                <button class="ac-close" onclick="closeArchiveModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="archive-grid" id="archive-grid"></div>
+        </div>
+    </div>
+
+    <div id="result-page" class="page">
+        <div class="result-subtitle result-reveal">✨ 你的 2DTI 人格档案 ✨</div>
+        <div id="result-title-main" class="result-title-main result-reveal">【加载中...】</div>
+        <div class="glass-card character-hero">
+            <div class="avatar-box" id="avatar-box"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            <div id="char-name" class="char-name result-reveal">角色名</div>
+            <div id="char-anime" class="char-anime result-reveal">《番剧名》</div>
+            <div id="char-tag" class="char-tag result-reveal">属性标签</div>
+            <div id="char-similarity" class="char-similarity result-reveal"><i class="fa-solid fa-fire"></i>契合度加载中...</div>
+            <div id="char-hobby-tags" class="char-tags-container result-reveal"></div>
+            <div id="char-roast" class="char-roast result-reveal">锐评加载中...</div>
+        </div>
+        <div class="glass-card analysis-card result-reveal">
+            <div id="chuuni-quote" class="chuuni-box result-reveal">中二语录加载中...</div>
+            <div class="analysis-title result-reveal">✦ 人格深度解析 ✦</div>
+            <div id="detailed-analysis" class="analysis-p result-reveal">分析加载中...</div>
+            <div style="font-size:13px; font-weight:900; color:var(--primary-hover); margin-bottom:6px;">你的灵魂匹配值排行</div>
+            <div id="compatibility-ranking" class="rank-list result-reveal"></div>
+        </div>
+        <div class="glass-card stats-container result-reveal">
+            <div class="stats-title result-reveal">✦ 灵魂五维雷达图 ✦</div>
+            <div class="radar-container"><canvas id="mainRadarChart"></canvas></div>
+        </div>
+        <div class="brand-slogan result-reveal">2DTI —— 发现你的二次元灵魂原型</div>
+        <div class="brand-slogan result-reveal" style="margin-top:-6px; margin-bottom:14px;">
+            作者：<a href="https://space.bilibili.com/350016742?spm_id_from=333.1387.0.0" target="_blank" rel="noopener noreferrer" style="color:var(--accent); font-weight:900; text-decoration: underline; text-underline-offset: 3px;">那位酷影</a>
+        </div>
+        <div class="btn-group-row result-reveal">
+            <button class="btn-primary" id="btn-generate-poster" onclick="generateHTMLPoster()"><i class="fa-solid fa-camera"></i> @你的好友来测 (生成海报)</button>
+            <button class="btn-outline" style="background: var(--card-bg);" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> 重置记忆，再测一次</button>
+        </div>
+    </div>
+
+    <div id="poster-capture-area" style="position: absolute; left: -9999px; top: 0; width: 420px; background: linear-gradient(135deg, #fff0f3, #ffccd5); padding: 25px; border-radius: 20px; box-sizing: border-box; text-align: center; color: #4a4a4a;">
+        <div style="position: absolute; top: 35px; left: 35px; font-family: 'Courier New', Courier, monospace; font-weight: 900; font-size: 18px; color: rgba(255, 77, 109, 0.5); letter-spacing: 2px;">2DTI</div>
+        <div style="background: rgba(255,255,255,0.95); border-radius: 24px; padding: 40px 20px 30px; box-shadow: 0 10px 30px rgba(255,126,179,0.2); border: 2px solid #fff; position: relative;">
+            <h2 id="poster-main-title" style="color: #ff4d6d; margin-bottom: 20px; font-size: 24px; font-weight: 900;">🔮 2DTI · 测测你的二次元灵魂原型</h2>
+            <div id="poster-avatar" style="width: 120px; height: 120px; margin: 0 auto 15px; border-radius: 32px; background: #ffffff; border: 4px solid #fff; box-shadow: 0 10px 20px rgba(255,126,179,0.3); overflow: hidden;"></div>
+            <div id="poster-name" style="font-size: 28px; font-weight: 900; margin-bottom: 8px; color: #4a4a4a;">名字</div>
+            <div id="poster-anime" style="font-size: 16px; font-weight: bold; color: #7a7a7a; margin-bottom: 12px; letter-spacing: 1px;">《番剧名》</div>
+            <div id="poster-similarity" style="font-size: 18px; font-weight: 900; color: #ff4d6d; margin-bottom: 12px;">🔥 灵魂契合度：99.9%</div>
+            <div id="poster-hobby-tags" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;"></div>
+            <div style="background: rgba(255,126,179,0.05); border-radius: 16px; padding: 15px; margin-bottom: 20px; border: 1px dashed rgba(255,126,179,0.3);">
+                <div style="text-align: center; font-weight: 900; color: #ff4d6d; margin-bottom: 10px; font-size: 16px;">✦ 灵魂五维雷达图 ✦</div>
+                <div style="position: relative; width: 100%; height: 200px; display: flex; justify-content: center;"><canvas id="posterRadarChart"></canvas></div>
+            </div>
+            <div id="poster-roast" style="font-size: 15px; line-height: 1.7; text-align: justify; background: rgba(255,126,179,0.08); padding: 20px; border-radius: 16px; border-left: 5px solid #ff7eb3; margin-bottom: 25px; color: #4a4a4a;">锐评...</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; border-top: 2px dashed #ffb3c6; padding-top: 25px;">
+                <img id="poster-qr" crossorigin="anonymous" src="" style="width: 90px; height: 90px; border-radius: 12px; border: 2px solid #fff;">
+                <div style="text-align: left;"><div style="color: #ff4d6d; font-weight: 900; font-size: 18px; margin-bottom: 6px;">@你的好友来测</div><div style="color: #7a7a7a; font-size: 13px; font-weight: bold;">长按保存，看看你是哪个二次元角色</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="poster-modal" class="modal-overlay" style="z-index: 999;">
+        <div class="poster-modal-content">
+            <div class="poster-img-container" id="poster-img-wrapper"><img id="generated-poster-img" src="" alt="专属海报" /></div>
+            <div class="poster-tip"><i class="fa-solid fa-download"></i> 长按图片保存，发给搭子吃瓜！</div>
+            <button class="close-poster-btn" onclick="closePoster()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+
+    <div id="share-modal" class="modal-overlay" style="z-index: 999;">
+        <div class="answer-card-modal" style="text-align: center;">
+            <div class="ac-header"><span class="ac-title" style="margin:0 auto; padding-left: 36px;">召唤次元搭子</span><button class="ac-close" onclick="closeShareModal()"><i class="fa-solid fa-xmark"></i></button></div>
+            <div id="share-character-preview" style="display:none; margin: 6px 0 12px; text-align:center;">
+                <img id="share-character-img" src="" alt="人格头像" style="width:72px; height:72px; object-fit:contain; border-radius:18px; border:3px solid #fff; background:#fff; box-shadow:var(--shadow-sm); margin-bottom:6px;">
+                <div id="share-character-name" style="font-size:13px; font-weight:900; color:var(--accent);"></div>
+            </div>
+            <div style="margin: 20px 0; display: flex; justify-content: center;"><div style="padding: 10px; background: #fff; border-radius: 16px; box-shadow: var(--shadow-md);"><img id="share-qr-img" src="" alt="二维码加载中" style="width: 180px; height: 180px; display: block;"></div></div>
+            <p style="color: var(--text-sub); font-size: 14px; margin-bottom: 25px; font-weight:bold;">扫码或复制链接分享给好友</p>
+            <div id="share-link-tip" style="font-size:12px; color:var(--text-sub); margin-bottom:10px; line-height:1.45; word-break:break-all;"></div>
+            <button class="btn-primary" style="width: 100%; justify-content: center; border-radius: 12px;" onclick="executeCopy()" id="copy-btn-text"><i class="fa-solid fa-link"></i> 一键复制测试链接</button>
+            <button class="btn-outline" style="width:100%; margin-top:10px; border-radius:12px;" onclick="configureShareUrl()"><i class="fa-solid fa-gear"></i> 设置分享链接</button>
+        </div>
+    </div>
+</div>
+<button id="settings-fab" class="settings-btn" onclick="toggleDisplaySettings()" aria-label="显示设置"><i class="fa-solid fa-sliders"></i></button>
+<div id="display-settings-panel" class="display-settings">
+    <div class="display-settings-title">显示调节</div>
+    <div class="settings-row">
+        <span class="settings-label">主题模式</span>
+        <button id="theme-toggle-btn" class="settings-toggle" onclick="toggleThemeMode()">切换夜间主题</button>
+    </div>
+    <div class="settings-row">
+        <span class="settings-label">毛玻璃强度：<span id="blur-value-label">12</span>px</span>
+        <input id="blur-range" class="settings-range" type="range" min="6" max="24" step="1" value="12" oninput="setGlassBlur(this.value)">
+    </div>
+</div>
+
+<script>
+    function getAvatarSrc(id) {
+        if (window.characterImages && window.characterImages[id]) return window.characterImages[id];
+        return `avatars/avatar_${id}.png`;
+    }
+
+    function createParticles() {
+        const bg = document.getElementById("bg-decorations");
+        if (!bg) return;
+        const lowMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const count = lowMotion ? 4 : (window.innerWidth <= 480 ? 8 : 12);
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < count; i++) {
+            const particle = document.createElement("div");
+            particle.className = "particle";
+            const size = Math.random() * 10 + 5;
+            particle.style.width = size + "px";
+            particle.style.height = size + "px";
+            particle.style.left = Math.random() * 100 + "vw";
+            particle.style.animationDuration = (Math.random() * 8 + 9) + "s";
+            particle.style.animationDelay = (Math.random() * 8) + "s";
+            frag.appendChild(particle);
+        }
+        bg.appendChild(frag);
+    }
+
+    const questionBank = [
+      { text: "在漫展碰到极其逆天的Cosplay（比如cos原石、马桶），你的真实反应是？", options: [
+        { text: "直接冲上去跪求合影！高呼一声义父！转头就在朋友圈发九宫格疯狂炫耀。", scores: { E: 2, I: 0, W: 0, D: 2 } },
+        { text: "远远地掏出手机偷拍个背影，发给基友：“快看，活的野生赛博精神病。”", scores: { E: 0, I: 2, W: 1, D: 1 } },
+        { text: "脚趾瞬间抓地，低头假装玩手机，一边觉得弱智一边加快脚步光速逃离现场。", scores: { E: 1, I: 1, W: 2, D: 0 } }
+      ]},
+      { text: "游戏大厅里遇到社牛队友开麦放震耳欲聋的土味DJ，你？", options: [
+        { text: "遇强则强！果断开麦放《好日子》或者大悲咒跟他激情对狙，决战紫禁之巅！", scores: { E: 2, I: 0, W: 0, D: 2 } },
+        { text: "卑微地敲键盘打字：“大哥，歌挺好听就是太费耳朵了，能稍微关一下吗？”", scores: { E: 1, I: 1, W: 2, D: 0 } },
+        { text: "熟练地点开计分板，点击静音加举报一条龙。内心毫无波澜，甚至还有点想笑。", scores: { E: 0, I: 2, W: 1, D: 1 } }
+      ]},
+      { text: "被朋友强行拉去饭局，一推门全是现充，你的状态：", options: [
+        { text: "只要我不尴尬尴尬的就是别人！十分钟后我已经开始挨个敬酒称兄道弟了。", scores: { E: 2, I: 0, W: 1, D: 1 } },
+        { text: "找个最偏的角落坐下。手机电量就是我的生命线，千万别cue我！", scores: { E: 0, I: 2, W: 1, D: 1 } },
+        { text: "战术性频上厕所，或者假装接电话：“喂老板？好我马上回公司改BUG！”", scores: { E: 0, I: 1, W: 0, D: 2 } }
+      ]},
+      { text: "走路上被街头UP主怼脸采访：“你的二次元老婆/老公是谁？”", options: [
+        { text: "瞬间化身传教士！对着镜头狂吹我推的神仙颜值和绝美剧情，口沫横飞停不下来。", scores: { E: 2, I: 0, W: 0, D: 2 } },
+        { text: "随便报个大众都知道的名字（比如名侦探柯南）糊弄过去，主打一个安全下车。", scores: { E: 1, I: 1, W: 2, D: 0 } },
+        { text: "眼神躲闪连连摆手，嘴里嘟囔着“对不起我没听懂”，像躲高利贷一样逃走。", scores: { E: 0, I: 2, W: 1, D: 1 } }
+      ]},
+      { text: "一个人吃火锅中途想去上厕所，你的心理活动：", options: [
+        { text: "直接跟隔壁桌不认识的大哥搭话：“哥帮忙盯下这锅毛肚，谢了啊！”", scores: { E: 2, I: 0, W: 2, D: 0 } },
+        { text: "膀胱局启动！只要我憋得够久，保洁阿姨就绝对收不走我的漏勺！", scores: { E: 0, I: 2, W: 0, D: 2 } },
+        { text: "把外套、包包、雨伞全堆在椅子上，布下一个让人不敢靠近的风水大阵。", scores: { E: 1, I: 1, W: 1, D: 0 } }
+      ]},
+      { text: "玩《我的世界》等生存建造游戏时，你更像哪种玩家？", options: [
+        { text: "变成无情的流水线厂长，满脑子都是自动化！帕鲁只要干不死，就往死里干！", scores: { S: 2, N: 0, W: 2, D: 0 } },
+        { text: "正经事一点不干。天天沉迷造空中违建，用TNT炸老家，或者把NPC关进地下室。", scores: { S: 0, N: 2, W: 0, D: 2 } },
+        { text: "老老实实当个赛博打工人，砍树、挖矿、造火柴盒，过着朴实无华的种田生活。", scores: { S: 1, N: 1, W: 2, D: 0 } }
+      ]},
+      { text: "看到老番里人气极高的女主突然被剧情强行喂屎，你：", options: [
+        { text: "大脑开启终极保护机制！自动屏蔽官方设定，在脑内光速生成十万字爽文自我催眠。", scores: { S: 0, N: 2, W: 0, D: 2 } },
+        { text: "化身列文虎克逐帧找BUG！去各大论坛写三千字长文，怒喷编剧逻辑崩坏！", scores: { S: 2, N: 0, W: 1, D: 1 } },
+        { text: "冷笑一声：“就这？”果断点右上角退出，并且把这个制作组永久拉进黑名单。", scores: { S: 1, N: 1, W: 2, D: 0 } }
+      ]},
+      { text: "听到网上有人大喊“原神，启动！”时，你的脑回路：", options: [
+        { text: "DNA狠狠动了！脑海里自动浮现出那扇洁白的大门和自己干瘪的钱包。", scores: { S: 2, N: 0, W: 2, D: 0 } },
+        { text: "开始进行深度的哲学思考：这个梗究竟为什么会火？它反映了怎样的时代精神？", scores: { S: 0, N: 2, W: 1, D: 1 } },
+        { text: "不管三七二十一，直接接上一句“启动！”。反正大家都在乐，我也跟着乐就完事了。", scores: { S: 1, N: 1, W: 0, D: 2 } }
+      ]},
+      { text: "如果异世界转生，你最想带什么金手指？", options: [
+        { text: "能看血条和经验值的系统面板。稳扎稳打刷怪掉装备，这才是男人的浪漫！", scores: { S: 2, N: 0, W: 2, D: 0 } },
+        { text: "极其抽象的因果律技能。哪怕偶尔会坑到自己，只要够花里胡哨、脑洞够大就行！", scores: { S: 0, N: 2, W: 0, D: 2 } },
+        { text: "我不求无敌，只求给我一个装满了肥宅快乐水、炸鸡和无限WIFI的异次元随身别墅。", scores: { S: 1, N: 1, W: 1, D: 0 } }
+      ]},
+      { text: "半夜两点睡不着躺在床上，脑子里通常在想什么？", options: [
+        { text: "如果明天丧尸病毒突然爆发，厨房里的泡面能撑几天？用平底锅爆头顺手吗？", scores: { S: 0, N: 2, W: 0, D: 2 } },
+        { text: "明早闹钟定了吗？花呗下个月要还多少？晚上这顿夜宵是不是点得太贵了？", scores: { S: 2, N: 0, W: 2, D: 0 } },
+        { text: "深夜社死反刍大会：五年前亲戚过年问我话时，我那句回答简直太逊了啊啊啊！", scores: { S: 1, N: 1, W: 0, D: 2 } }
+      ]},
+      { text: "你推的角色突然成了毁灭世界的反派，你：", options: [
+        { text: "理智彻底崩盘：“策划脑子进水了？这人设碎了一地！爷不伺候了，直接退坑！”", scores: { T: 2, F: 0, W: 2, D: 0 } },
+        { text: "三观跟着五官跑！她一定是被逼的！别说毁灭世界了，我马上过去帮她递打火机！", scores: { T: 0, F: 2, W: 0, D: 2 } },
+        { text: "心情无比复杂但最终选择妥协。默默去贴吧发个帖吐槽一下，然后继续捏着鼻子玩下去。", scores: { T: 1, F: 1, W: 1, D: 0 } }
+      ]},
+      { text: "你抽卡全保底，群友发了“单抽双黄”图骑脸，你：", options: [
+        { text: "推了推眼镜，冷漠地甩出一张正态分布图，试图用冰冷的概率论摧毁他的优越感。", scores: { T: 2, F: 0, W: 1, D: 1 } },
+        { text: "瞬间化身阴暗爬行的嫉妒怪！在群里狂发流泪猫猫头和“杀杀杀”表情包。", scores: { T: 0, F: 2, W: 0, D: 2 } },
+        { text: "表面大度地发个“沾沾仙气”，实则后槽牙已经咬碎，默默画圈圈诅咒他小保底必歪。", scores: { T: 1, F: 1, W: 2, D: 0 } }
+      ]},
+      { text: "好基友半夜发Emo朋友圈抱怨生活，你第一反应：", options: [
+        { text: "职业病发作。直接在脑内帮他画思维导图分析利弊，试图提供最优的解决方案。", scores: { T: 2, F: 0, W: 2, D: 0 } },
+        { text: "共情能力瞬间拉满！立刻长语音安慰，甚至想顺着网线爬过去陪他一起大骂这个世界。", scores: { T: 0, F: 2, W: 0, D: 2 } },
+        { text: "假装没看见。心想成年人的崩溃应该在明天早八前自动痊愈，第二天再装傻慰问一下。", scores: { T: 1, F: 1, W: 1, D: 1 } }
+      ]},
+      { text: "玩道德抉择游戏（献祭萝莉NPC拯救全村），你选：", options: [
+        { text: "冰冷的功利主义者。为了爆出那把绝世神器或者看真结局，对不起了，这萝莉必须死！", scores: { T: 2, F: 0, W: 2, D: 0 } },
+        { text: "纯爱无敌！敢碰我推的NPC一根寒毛，我今天就把这游戏里的神全屠了，村子算什么！", scores: { T: 0, F: 2, W: 0, D: 2 } },
+        { text: "陷入极度疯狂的内耗。切出游戏搜了半小时攻略，试图寻找卡BUG不牺牲任何人的方法。", scores: { T: 1, F: 1, W: 1, D: 0 } }
+      ]},
+      { text: "队友副本狂犯低级错误导致团灭，你麦克风传出：", options: [
+        { text: "严厉导师上线：“法师你技能CD没算好，刚才走位也靠左了，再犯这种错你自己退。”", scores: { T: 2, F: 0, W: 2, D: 0 } },
+        { text: "老好人附体：“没事没事，刚才就差那么一点点了，大家喝口水调整一下再战！”", scores: { T: 0, F: 2, W: 1, D: 0 } },
+        { text: "深吸一口气，然后直接闭麦。在心里把队友的祖宗十八代问候了一遍，继续冷酷输出。", scores: { T: 1, F: 1, W: 0, D: 2 } }
+      ]},
+      { text: "明早有重要早八，今晚11点你点开神级新番：", options: [
+        { text: "毫无感情的自律机器。看完一集直接关电脑睡觉，泰山崩于前我也要按时打卡。", scores: { J: 2, P: 0, W: 2, D: 0 } },
+        { text: "“再看一集我就睡” → “卧槽怎么天亮了？”。第二天顶着黑眼圈变成丧尸。", scores: { J: 0, P: 2, W: 0, D: 2 } },
+        { text: "苦苦挣扎型。看了三集后，在强烈的负罪感和剧烈的心跳中恋恋不舍地放下手机。", scores: { J: 1, P: 1, W: 1, D: 0 } }
+      ]},
+      { text: "你的电脑桌面或游戏背包通常是什么状态？", options: [
+        { text: "极其舒适的强迫症。文件按颜色、首字母、重要程度分门别类，整齐得像件艺术品。", scores: { J: 2, P: 0, W: 2, D: 0 } },
+        { text: "彻头彻尾的赛博垃圾站。满屏“新建文件夹(1)”和乱码截图，找东西全靠全局搜索。", scores: { J: 0, P: 2, W: 0, D: 2 } },
+        { text: "表面上看起来光鲜亮丽，但只要你不点开那个名为“杂件”的深渊文件夹，一切都很美好。", scores: { J: 1, P: 1, W: 1, D: 1 } }
+      ]},
+      { text: "关于长周期工作或寒暑假作业，你通常怎么搞定？", options: [
+        { text: "早就建好了完美的进度表，每天雷打不动做10%，死线前甚至还有空喝杯下午茶。", scores: { J: 2, P: 0, W: 2, D: 0 } },
+        { text: "前期疯狂装死，直到死线前24小时才化身八爪鱼，一边爆哭一边创造奇迹！", scores: { J: 0, P: 2, W: 0, D: 2 } },
+        { text: "刚开始跟打了鸡血一样猛干两天，然后名正言顺地摸鱼半个月，最后几天随便糊弄交差。", scores: { J: 1, P: 1, W: 1, D: 0 } }
+      ]},
+      { text: "写同人文或剪视频，你的过程是：", options: [
+        { text: "步步为营。写好万字大纲，分镜画得明明白白，像个精准的外科医生一样推进。", scores: { J: 2, P: 0, W: 2, D: 0 } },
+        { text: "灵感狂飙！大半夜突然触电般跳起来直接开搞，写到哪算哪，大纲全都是狗屁！", scores: { J: 0, P: 2, W: 0, D: 2 } },
+        { text: "有个大概的想法，但中途经常因为刷手机跑偏，最后的成品和最初的想法毫不相干。", scores: { J: 1, P: 1, W: 1, D: 0 } }
+      ]},
+      { text: "对于“计划赶不上变化”，你在生活中更倾向：", options: [
+        { text: "狂怒状态！我已经规划好了完美的周末安排，你告诉我停电？烦躁得想砸东西！", scores: { J: 2, P: 0, W: 1, D: 1 } },
+        { text: "简直是狂喜！停电了？太好了！终于有理由名正言顺地躺在床上发呆做白日梦了！", scores: { J: 0, P: 2, W: 0, D: 2 } },
+        { text: "只是长长地叹了一口气。默默掏出手机看还有多少电，然后考虑要不要去外面网吧包宿。", scores: { J: 1, P: 1, W: 2, D: 0 } }
+      ]},
+      { text: "朋友聚会玩真心话大冒险，你通常：", options: [
+        { text: "唯恐天下不乱！专门逮着社死问题问，疯狂起哄带节奏，笑得比谁都大声。", scores:{E:2,I:0,W:0,D:2} },
+        { text: "把自己缩在角落里瑟瑟发抖，全程降低存在感，心里疯狂默念“别抽到我别抽到我”。", scores:{E:0,I:2,W:2,D:0} },
+        { text: "当个圆滑的和平使者。选个不痛不痒的真心话，绝不作死，主打一个安全下车。", scores:{E:1,I:1,W:1,D:0} }
+      ]},
+      { text: "看动漫时遇到没看懂的烧脑伏笔：", options: [
+        { text: "立刻按暂停！打开B站去搜一万字的解析视频，不把里面的物理学原理搞懂绝不往下看。", scores:{S:2,N:0,W:2,D:0} },
+        { text: "管他什么原不原理，只要画面够炫战斗够燃就行！逻辑漏洞全靠我自己发散脑补。", scores:{S:0,N:2,W:0,D:2} },
+        { text: "看不懂但大受震撼。默默在弹幕里扣个“？”，然后跟着大部队一起刷牛逼就完了。", scores:{S:1,N:1,W:1,D:0} }
+      ]},
+      { text: "如果有魔法，你更倾向用来：", options: [
+        { text: "别搞那些虚的，立刻给我变出一座金山和几套房！马上宣布退休，实现财富自由躺平！", scores:{T:2,F:0,W:2,D:0} },
+        { text: "我要消除世界上所有的战争和疾病！或者强行施法把那些意难平的CP死死锁在一起！", scores:{T:0,F:2,W:0,D:2} },
+        { text: "什么大事都不想干，只想用来洗碗扫地，以及每天早上卡点瞬移去公司打卡防迟到。", scores:{T:1,F:1,W:1,D:0} }
+      ]},
+      { text: "去完全陌生的城市旅游：", options: [
+        { text: "化身特种兵导游。Excel表格精确到分钟，连午饭吃什么菜、上哪个厕所都安排得明明白白。", scores:{J:2,P:0,W:2,D:0} },
+        { text: "纯正的流浪汉玩法。只买一张单程票走到哪算哪，甚至连晚上要睡哪个桥洞都不知道。", scores:{J:0,P:2,W:0,D:2} },
+        { text: "定好口碑好的酒店和几个必去打卡的景点，剩下的时间就是躺在酒店玩手机或者附近瞎逛。", scores:{J:1,P:1,W:1,D:0} }
+      ]},
+      { text: "遇到极度离谱的网络杠精时：", options: [
+        { text: "键盘瞬间冒出火星子！全程不带一个脏字，用极其犀利的阴阳怪气和他大战三百回合！", scores:{E:2,I:0,W:0,D:2} },
+        { text: "觉得跟这种生物多说一句话都是在浪费阳寿。直接一套拉黑、举报、屏蔽的连招保平安。", scores:{E:0,I:2,W:2,D:0} },
+        { text: "懒得打字长篇大论，直接回一句“啊对对对你说的都对”，然后关掉手机想象他气急败坏的样子。", scores:{E:1,I:1,W:0,D:2} }
+      ]},
+      { text: "对“命运”的看法是：", options: [
+        { text: "我命由我不由天！什么狗屁命运，我只相信每个月到账的工资卡和我自己肝出来的经验值。", scores:{S:2,N:0,W:2,D:0} },
+        { text: "绝对的宿命论。冥冥之中一切皆有定数，前世五百次回眸才换来今生抽卡一次十连双黄。", scores:{S:0,N:2,W:0,D:2} },
+        { text: "有没有命运其实都无所谓，反正明天一早还是得爬起来去搬砖，安稳过好今天就谢天谢地了。", scores:{S:1,N:1,W:1,D:0} }
+      ]},
+      { text: "别人夸你的时候，内心真实想法：", options: [
+        { text: "表面不动声色，内心疯狂拉响警报，冷静分析这人是不是想找我借钱或者准备把锅甩给我？", scores:{T:2,F:0,W:2,D:0} },
+        { text: "表面疯狂摆手连说“没有没有”，其实心里在猛开香槟，恨不得拿录音笔录下来每天循环播放。", scores:{T:0,F:2,W:0,D:2} },
+        { text: "极度的手足无措。尴尬得脚趾在鞋里疯狂抠地，不知道手往哪放，只能发出几声诡异的傻笑。", scores:{T:1,F:1,W:1,D:1} }
+      ]},
+      { text: "游戏里拿到极为稀有的珍贵道具：", options: [
+        { text: "死死锁在背包最深处！哪怕一直打到大结局，主角都被BOSS打死了我都绝对舍不得拿出来用！", scores:{J:2,P:0,W:1,D:1} },
+        { text: "管它稀不稀有，先用掉听个响再说！早买早享受，一直留在包里又不能生出利息来！", scores:{J:0,P:2,W:0,D:2} },
+        { text: "立刻切出游戏查百度百科，确保把它用在收益最大、性价比最高的那个隐藏合成配方上。", scores:{J:1,P:1,W:2,D:0} }
+      ]},
+      { text: "若陷入无限轮回，每天醒来都是同一天：", options: [
+        { text: "彻底的混乱邪恶！把现实中根本不敢干的违纪乱法、极度发疯的事情全干一遍！反正明天重置！", scores:{W:0,D:3,S:0,N:0} },
+        { text: "拿出一个小本本，开始极其冷静地记录每一天的各种变量，试图找出打破轮回的物理规律。", scores:{W:2,D:0,S:2,N:0} },
+        { text: "太爽了吧！每天都可以心安理得地躺在家里打游戏不用上班了！这辈子永远都等不到星期一！", scores:{W:0,D:2,S:1,N:1} }
+      ]},
+      { text: "面对突如其来的巨额财富（比如中彩票）：", options: [
+        { text: "极度谨慎。戴上面具领奖，第一时间联系顶级律师，做好天衣无缝的隐姓埋名和理财计划。", scores:{J:2,P:0,W:3,D:0} },
+        { text: "当晚直接去提一台保时捷，然后在朋友圈疯狂咆哮“我摊牌了老子现在是亿万富翁了”！", scores:{J:0,P:2,W:0,D:3} },
+        { text: "钱存银行慢慢吃利息，明天继续穿上旧衣服去上班摸鱼，只不过看老板的眼神已经充满了不屑。", scores:{J:1,P:1,W:2,D:0} }
+      ]}
+    ];
+
+    const characterDB = {
+      INTJ: { W: { avatar_id: 18, name: "蓝染惣右介", anime: "《死神 BLEACH》", tag: "逼王之王", tags: ["#智性恋天菜", "#PUA大师", "#发胶大户"], roast: "『只要计划没出错，我连呼吸都是完美的。』确诊为极度自恋的智性恋晚期。平时看着像个衣冠楚楚的正常人，脑子里其实早就把你按斤称好卖给哪个黑厂了。建议少看点霸总文学，多下楼拿拿外卖接接地气，别成天做统治世界的梦了。" }, D: { avatar_id: 19, name: "鲁路修", anime: "《叛逆的鲁路修》", tag: "掀桌狂魔", tags: ["#重度妹控", "#中二晚期", "#究极傲娇"], roast: "『毁灭吧，赶紧的，累了。』重度中二病叠加反社会人格，洗澡的时候都在构思怎么推翻公司群。其实就是个死要面子的重度傲娇，别人一句夸能让你在被窝里扭成蛆，表面还要装作冷酷无情。别装了，你的底裤都漏出来了！" } },
+      INTP: { W: { avatar_id: 20, name: "齐木楠雄", anime: "《齐木楠雄的灾难》", tag: "无敌超能力淡人", tags: ["#究极淡人", "#人形测谎仪", "#咖啡果冻控"], roast: "『人类这种生物，真是吵闹得让人头疼。』顶级淡人，人形测谎仪。你对这世界的全部热情加起来还不如一个抹茶果冻。别人社交是充电，你社交是漏电，每天最大的愿望就是全人类立刻闭嘴。确诊为：没有超能力的命，却得了超能力的病。" }, D: { avatar_id: 21, name: "波奇酱", anime: "《孤独摇滚！》", tag: "顶级粉色废料", tags: ["#赛博社恐", "#粉色废料", "#阴暗爬行"], roast: "『啊...对不起...我这就去死...』赛博空间里重拳出击，各种梗信手拈来；现实生活里唯唯诺诺，连对服务员说句“不要香菜”都要做三天的心理建设。你的精神状态堪比被踩了一脚的尖叫鸡，除了会阴暗爬行什么都做不好。" } },
+      ENTJ: { W: { avatar_id: 22, name: "艾尔文团长", anime: "《进击的巨人》", tag: "献出心脏的恶魔", tags: ["#无情KPI机器", "#天选打工人", "#传销头子"], roast: "『只要能达成KPI，把你献祭了也不是不行。』天选打工人，资本家看了都流泪的究极卷王。你不仅自己卷，还要拉着所有人一起卷，谁不卷谁就是人类的叛徒。建议把“狼性文化”刻在脑门上，小心年纪轻轻就因为过度劳累而秃顶啊朋友！" }, D: { avatar_id: 23, name: "玛奇玛", anime: "《电锯人》", tag: "全服第一坏女人", tags: ["#坏胚子", "#PUA祖师爷", "#生姜烧肉"], roast: "『汪？大声点，我听不见。』纯种的坏胚子，职场PUA大师。你把所有人当成可以消耗的工具人，连狗路过都要被你踹两脚测试一下服从度。喜欢把别人的尊严按在地上摩擦，但夜深人静时其实极其渴望有人能真的懂你（虽然绝对不可能）。" } },
+      ENTP: { W: { avatar_id: 24, name: "夜神月", anime: "《死亡笔记》", tag: "新世界的神", tags: ["#诡辩王者", "#腹黑怪", "#计划通"], roast: "『你们这些凡人，根本不懂我的高级幽默。』智商全点在了诡辩和抬杠上，一天不找人吵架浑身难受。表面上是个光鲜亮丽的好青年，背地里却是个随时准备写《死亡笔记》的腹黑怪。别太自信了，迟早有一天翻车在自己的嘴贱上。" }, D: { avatar_id: 25, name: "五条悟", anime: "《咒术回战》", tag: "天上天下唯我独癫", tags: ["#宇宙级乐子人", "#精神状态超前", "#最强癫公"], roast: "『只要我不尴尬，尴尬的就是全世界！』宇宙级乐子人，精神状态领先人类五百年。日常操作是在别人的雷区上疯狂蹦迪，还觉得自己帅呆了。你不仅是个癫公/癫婆，还是个实力强劲的癫公/癫婆，让人恨得牙痒痒又干不掉你。" } },
+      INFJ: { W: { avatar_id: 26, name: "宇智波鼬", anime: "《火影忍者》", tag: "背负一切的弟控", tags: ["#悲剧主角", "#究极弟控", "#圣母光环"], roast: "『我背负的可是整个宇宙的重量。』悲剧主角综合征晚期。天天觉得自己是个为了大局牺牲小我的圣母，其实就是太喜欢把什么屁事都往自己身上揽。少给自己加戏了，地球没你照样转，赶紧去睡个好觉放下你那该死的救世主情结吧！" }, D: { avatar_id: 27, name: "晓美焰", anime: "《魔法少女小圆》", tag: "轮回系病娇", tags: ["#纯爱战神", "#疯批病娇", "#重度缺爱"], roast: "『为了你，就算让我变成疯批也在所不惜！』纯爱战神应声倒地！表面上是个高冷理智的男神/女神，内心其实是个极度缺爱的疯批病娇。一旦认定了谁，就算把世界炸了也要把他绑在身边。建议立刻下载国家反诈中心，你太容易被骗了。" } },
+      INFP: { W: { avatar_id: 28, name: "夏目贵志", anime: "《夏目友人帐》", tag: "温柔神明", tags: ["#脆皮玻璃心", "#眼泪水龙头", "#治愈系天使"], roast: "『今天的一阵风，又让我感伤了半小时。』脆皮玻璃心，泪腺发达程度堪比水龙头。看到路边一棵草都能脑补出一出五十集的虐心大戏。你太温柔了，温柔到总是委屈自己成全别人。快醒醒吧！这世界是个巨大的草台班子，该发疯时就发疯！" }, D: { avatar_id: 29, name: "碇真嗣", anime: "《新世纪福音战士》", tag: "脆皮心碎小狗", tags: ["#内耗大王", "#退堂鼓专家", "#需要鸡血"], roast: "『都是我的错...我不干了...让我走...』内耗大王，退堂鼓国家级演奏家。遇到困难的第一反应是“我不行我不行”，然后缩进被窝里阴暗地画圈圈。你的心理防线比薯片还脆，需要每天被人强行注入八百毫升鸡血才能勉强活下去。" } },
+      ENFJ: { W: { avatar_id: 30, name: "欧尔麦特", anime: "《我的英雄学院》", tag: "和平的象征", tags: ["#正能量发电机", "#救世主执念", "#过度操心"], roast: "『只要看到我，一切就都没问题了！』行走的正能量发电机，随时随地准备给别人打满鸡血。你对拯救世界的执念已经到了病态的地步，看到谁不开心都想冲上去给个拥抱。但老实说，你这副热情过头的样子有时候真的挺吓人的。" }, D: { avatar_id: 31, name: "炼狱杏寿郎", anime: "《鬼灭之刃》", tag: "燃烧的大哥", tags: ["#热血笨蛋", "#爆炸瓦斯桶", "#嗓门超大"], roast: "『燃烧吧！燃烧吧！直到把你我都烧成灰烬！』热血笨蛋，嗓门大到能震碎玻璃。你就像个随时都在爆炸边缘的瓦斯桶，只要有人给你一个火星，你就能当场燃尽自己照亮别人。建议随身携带降压药，小心哪天真的因为太激动而脑血管破裂。" } },
+      ENFP: { W: { avatar_id: 32, name: "宫园薰", anime: "《四月是你的谎言》", tag: "燃烧生命的恒星", tags: ["#浪漫主义", "#三分钟热度", "#闪闪发光"], roast: "『不管明天会怎样，今天都要开心啊！』无可救药的浪漫主义者，永远都在追逐下一个闪闪发光的目标。你就像一阵抓不住的风，给别人带来快乐后又迅速跑路。你的三分钟热度简直让人叹为观止，这辈子买的最多的东西可能就是吃灰的装备。" }, D: { avatar_id: 33, name: "虎杖悠仁", anime: "《咒术回战》", tag: "吃手指的阳光大男孩", tags: ["#究极多动症", "#社交悍匪", "#清澈的愚蠢"], roast: "『哇塞！那个是什么！好酷！我也要玩！』究极多动症，哈士奇转世。你的精力旺盛到让人怀疑是不是偷偷吃了兴奋剂，跟谁都能称兄道弟，毫无社交距离感。你那清澈的愚蠢总能拯救气氛，但也经常因为不带脑子而闯出惊天大祸。" } },
+      ISTJ: { W: { avatar_id: 34, name: "七海建人", anime: "《咒术回战》", tag: "准点下班狂魔", tags: ["#打工机器", "#规矩就是命", "#靠谱老爹"], roast: "『下班时间到了，多说一个字都要收加班费。』莫得感情的打工机器，规矩就是你的命。你对那些不守规矩的乐子人深恶痛绝，每天最大的愿望就是世界和平、准点下班。虽然嘴上天天抱怨，但真出了事你绝对是一边骂骂咧咧一边收拾烂摊子的爹。" }, D: { avatar_id: 35, name: "伏黑惠", anime: "《咒术回战》", tag: "摇人召唤师", tags: ["#暴躁老哥", "#双标王者", "#同归于尽"], roast: "『烦死了，全都毁灭吧，我只救我想救的人。』表面是个稳重靠谱的高冷男神/女神，其实骨子里是个随时准备掀桌子的暴躁老哥/老姐。你有一套极其自我的双标准则，谁敢碰你的底线，你绝对会拉着他一起下地狱，连骨灰都不给他留。" } },
+      ISFJ: { W: { avatar_id: 1, name: "薇尔莉特", anime: "《紫罗兰永恒花园》", tag: "自动手记人偶", tags: ["#无私奉献", "#天生操心命", "#究极老好人"], roast: "『我会完美地执行您的每一个指令。』毫无保留的奉献者，你的存在仿佛就是为了给别人当妈/爹。你太习惯于听从命令和照顾别人了，以至于常常忘记自己也需要被照顾。是个容易被渣男/白眼狼吃干抹净还要帮着数钱的究极老好人。" }, D: { avatar_id: 2, name: "我妻由乃", anime: "《未来日记》", tag: "病娇鼻祖", tags: ["#护食狂魔", "#掏柴刀", "#病娇祖师爷"], roast: "『如果有谁敢靠近你，我就把他大卸八块~』病娇界的祖师爷。平时看着温温柔柔贤良淑德，一旦触碰了你的“专属物”，立刻触发狂暴模式，从裙底掏出柴刀。你那极度扭曲的占有欲简直让人头皮发麻，绝对是这辈子最不能惹的狠角色。" } },
+      ESTJ: { W: { avatar_id: 3, name: "琴团长", anime: "《原神》", tag: "西风骑士团卷王", tags: ["#居委会大妈", "#操心命", "#过劳死预备"], roast: "『风纪就是一切，谁敢摸鱼我就扣谁工资！』居委会大妈/大爷转世，天生的操心命。你看不惯任何不按计划进行的事情，每天像个陀螺一样转个不停，还要拿着鞭子抽着别人一起转。建议稍微放松点，不然迟早有一天因为过度劳累而英年早逝。" }, D: { avatar_id: 4, name: "远坂凛", anime: "《Fate系列》", tag: "踢爆狗头管家婆", tags: ["#死鸭子嘴硬", "#财迷", "#教科书傲娇"], roast: "『你这个笨蛋！我才没有关心你呢！』教科书级别的死傲娇，嘴硬程度堪比钻石。明明心里担心得要死，嘴上却非要把人损得体无完肤。你那可笑的自尊心和掌控欲总是让你在感情里疯狂吃瘪，但你依然死鸭子嘴硬，绝不承认自己错了。" } },
+      ESFJ: { W: { avatar_id: 5, name: "毛利兰", anime: "《名侦探柯南》", tag: "角跃碎石独角兽", tags: ["#圣母交际花", "#物理说服", "#委屈自己"], roast: "『大家都要好好相处哦，不然我会用物理方式让你冷静一下的。』圣母光环闪耀的交际花，永远都在操心别人有没有吃饱穿暖。你渴望被需要，害怕被孤立，甚至有时会为了合群而委屈自己。虽然很温柔，但逼急了展现出的物理破坏力能把人直接送走。" }, D: { avatar_id: 6, name: "亚丝娜", anime: "《刀剑神域》", tag: "全服第一人妻辅助", tags: ["#铁血老妈子", "#护犊子", "#情绪黑化"], roast: "『如果谁敢欺负我的朋友，我就让他尝尝我的剑！』护犊子狂魔，团队里的铁血老妈子。平时和和气气，但要是踩了你的雷，你会瞬间变成拿着菜刀砍你十八条街的母夜叉。情绪价值给得极高，但也需要别人同等的回报，不然当场黑化。" } },
+      ISTP: { W: { avatar_id: 7, name: "利威尔兵长", anime: "《进击的巨人》", tag: "一米六的战神", tags: ["#重度洁癖", "#冷酷面瘫", "#能动手不哔哔"], roast: "『啧，脏死了，赶紧打扫干净。』冷酷无情的现实主义者，重度洁癖患者。你对所有的矫情和废话都过敏，信奉“能动手绝不哔哔”的真理。你像一把锋利的手术刀，切开一切虚伪的表象。虽然外表很酷，但内心其实有点社恐，全靠面瘫掩饰。" }, D: { avatar_id: 8, name: "坂田银时", anime: "《银魂》", tag: "糖分控死鱼眼", tags: ["#混吃等死", "#白夜叉", "#帅不过三秒"], roast: "『只要有糖分，就算是地狱我也能活下去。』混吃等死的究极废柴。日常主打一个随地大小躺，懒得连呼吸都嫌费劲。但你这幅吊儿郎当的皮囊下，其实藏着极其可怕的战斗力和护短的狠劲。是个平时想让人踹两脚，关键时刻却帅得掉渣的混蛋。" } },
+      ISFP: { W: { avatar_id: 9, name: "芙莉莲", anime: "《葬送的芙莉莲》", tag: "活了千年的淡人", tags: ["#反射弧超长", "#破烂收藏家", "#面部神经失调"], roast: "『也就过去了一百年而已，有什么大惊小怪的。』时间观念极其淡薄的古生物，对大部分人类的悲欢离合都感到难以共情。你的生活节奏比树懒还慢，每天沉浸在自己收集破烂的小世界里。你那面瘫般的淡定，经常让人怀疑你是不是面部神经坏死了。" }, D: { avatar_id: 10, name: "莱欧斯", anime: "《迷宫饭》", tag: "纯真变态魔物食客", tags: ["#纯真变态", "#脑回路清奇", "#不顾死活"], roast: "『哇！这个长得好奇怪，不知道吃起来是什么味道！』纯真又变态的好奇宝宝，脑回路完全异于常人。你的关注点永远和正常人不在同一个频道上，总能在一件严肃的事情里找到最离谱的乐子。你那不顾死活的探索欲，迟早会把你送进怪物的肚子里。" } },
+      ESTP: { W: { avatar_id: 11, name: "达达利亚", anime: "《原神》", tag: "至冬国最强钱包", tags: ["#战斗狂人", "#冤大头", "#哈士奇发情"], roast: "『来吧！让我看看你到底有几斤几两！』满脑子都是打架和找刺激的战斗狂人。你像个随时发情的哈士奇，哪里有热闹就往哪里钻。你的自信和张扬很有魅力，但很多时候也显得像个人傻钱多的冤大头。少点盲目的冲动，多长点脑子吧！" }, D: { avatar_id: 12, name: "星/穹", anime: "《崩坏：星穹铁道》", tag: "翻垃圾桶的吗喽", tags: ["#法外狂徒", "#抽象鼻祖", "#无可救药"], roast: "『只要是垃圾桶，就一定有翻的价值！』完全不按套路出牌的法外狂徒。你的行为逻辑可以用“抽象”两个字来完美概括，不管是发疯、作死还是整活，你永远冲在第一线。只要有你在的地方，画风迟早会变成无可救药的搞笑番。" } },
+      ESFP: { W: { avatar_id: 13, name: "蒙奇·D·路飞", anime: "《海贼王》", tag: "橡胶笨蛋", tags: ["#单细胞生物", "#脑子被吃掉了", "#超级大笨蛋"], roast: "『肉——！我要吃肉——！』一根筋的单细胞生物，大脑皮层十分光滑。你对复杂的事情完全无法理解，人生信条就是“吃好喝好，兄弟都在”。你那极具感染力的乐观总能吸引一群人跟着你瞎胡闹，是个让人又爱又恨的超级大笨蛋。" }, D: { avatar_id: 14, name: "派蒙", anime: "《原神》", tag: "最佳捧哏应急食品", tags: ["#应急食品", "#行走的表情包", "#贪财贪吃"], roast: "『前面的区域，以后再来探索吧！』最吵闹的应急食品，行走的表情包。你又贪财又贪吃，遇到危险跑得比谁都快，抢战利品的时候却总是冲在最前面。虽然你看起来百无一用，但你那精准的吐槽和捧哏能力，已经是不可或缺的搞笑担当了。" } }
+    };
+
+    const easterEggs = {
+      DIO: { avatar_id: 15, name: "迪奥·布兰度 (DIO)", anime: "《JOJO的奇妙冒险》", tag: "纯度100%癫佬", tags: ["#反人类", "#阿卡姆院长", "#迷之自信"], roast: "『Wryyyyyy！你们这些猴子，也敢直视我！』恭喜你，你的精神状态已经超脱了碳基生物的极限。你不仅狂妄自大、目中无人，还拥有一种莫名其妙的迷之自信。你就像一个到处散播混乱的毒瘤，让人忍不住想报警把你抓起来。赶紧去精神病院挂个专家号吧！" },
+      BLANK: { avatar_id: 16, name: "空白 (空&白)", anime: "《游戏人生》", tag: "终极自闭尼特族", tags: ["#见光死", "#二次元腐烂", "#社交能量负数"], roast: "『现实世界是个垃圾游戏，还是让我在二次元里腐烂吧。』究极自闭尼特族，社交能量终年处于负数。只要脱离了屏幕和网络，你就会像离开水的鱼一样迅速窒息。你对三次元的人类充满了恐惧和抗拒，宁愿和纸片人谈恋爱也不出门倒垃圾。没救了，等死吧。" },
+      SAITAMA: { avatar_id: 17, name: "埼玉", anime: "《一拳超人》", tag: "超脱因果无敌淡人", tags: ["#情绪死鱼", "#秃头披风", "#看破红尘"], roast: "『哦，是吗。超市今天特卖，我要赶紧去了。』无敌的秃头披风侠，情绪波动约等于一条死鱼。你已经强大到/麻木到对世间万物都提不起兴趣，哪怕地球明天爆炸，你关心的也只是家里的白菜有没有打折。你那种看透红尘的淡然，简直让人想揪着你的衣领摇醒你！" }
+    };
+
+    let currentQ = 0;
+    let userAnswers = new Array(questionBank.length).fill(null);
+    let finalResultData = null;
+    let mainRadarChart = null;
+    let posterRadarChart = null;
+    let displaySettingsOpen = false;
+
+    const ENABLE_EASTER_EGGS = true;
+    const SHOW_EASTER_EGGS_IN_ARCHIVE = false;
+    let easterTapCount = 0;
+    let easterGateUnlocked = localStorage.getItem("mbti_easter_gate") === "1";
+    const allCharactersList = [];
+    for (const type in characterDB) {
+      allCharactersList.push({ type, wd: "W", ...characterDB[type].W });
+      allCharactersList.push({ type, wd: "D", ...characterDB[type].D });
+    }
+    if (ENABLE_EASTER_EGGS && SHOW_EASTER_EGGS_IN_ARCHIVE) {
+      for (const key in easterEggs) allCharactersList.push({ type: "???", wd: "?", ...easterEggs[key] });
+    }
+    allCharactersList.sort((a, b) => a.avatar_id - b.avatar_id);
+    const TOTAL_CHAR_COUNT = allCharactersList.length;
+
+    function updateHomeUnlockCount() {
+      const unlocked = JSON.parse(localStorage.getItem("mbti_unlocked") || "[]");
+      const validUnlocked = unlocked.filter((id) => allCharactersList.some((c) => c.avatar_id === id));
+      const el = document.getElementById("home-unlock-count");
+      if (el) el.innerText = validUnlocked.length;
+      const totalEl = document.getElementById("home-total-count");
+      if (totalEl) totalEl.innerText = TOTAL_CHAR_COUNT;
+    }
+
+    function unlockCharacter(id) {
+      const unlocked = JSON.parse(localStorage.getItem("mbti_unlocked") || "[]");
+      if (!unlocked.includes(id)) {
+        unlocked.push(id);
+        localStorage.setItem("mbti_unlocked", JSON.stringify(unlocked));
+      }
+      updateHomeUnlockCount();
+    }
+
+    function openArchiveModal() {
+      const modal = document.getElementById("archive-modal");
+      const grid = document.getElementById("archive-grid");
+      const unlocked = JSON.parse(localStorage.getItem("mbti_unlocked") || "[]");
+      const validUnlocked = unlocked.filter((id) => allCharactersList.some((c) => c.avatar_id === id));
+      document.getElementById("modal-unlock-count").innerText = validUnlocked.length;
+      document.getElementById("modal-total-count").innerText = TOTAL_CHAR_COUNT;
+      grid.innerHTML = "";
+      allCharactersList.forEach((char) => {
+        const isUnlocked = validUnlocked.includes(char.avatar_id);
+        const isRare = char.avatar_id > 32;
+        const item = document.createElement("div");
+        item.className = `archive-item ${isUnlocked ? "" : "locked"} ${isRare && isUnlocked ? "rare" : ""}`;
+        const avatarBox = document.createElement("div");
+        avatarBox.className = "archive-avatar-box";
+        const img = document.createElement("img");
+        img.loading = "lazy";
+        img.decoding = "async";
+        img.src = getAvatarSrc(char.avatar_id);
+        if (!isUnlocked) img.style.filter = "brightness(0) opacity(0.12)";
+        avatarBox.appendChild(img);
+        const nameEl = document.createElement("div");
+        nameEl.className = "archive-name";
+        nameEl.innerText = isUnlocked ? char.name : "???";
+        const tagEl = document.createElement("div");
+        tagEl.className = "archive-tag";
+        tagEl.innerText = isUnlocked ? char.tag : "未解锁";
+        item.appendChild(avatarBox);
+        item.appendChild(nameEl);
+        item.appendChild(tagEl);
+        grid.appendChild(item);
+      });
+      modal.classList.add("show");
+    }
+
+    function closeArchiveModal() { document.getElementById("archive-modal").classList.remove("show"); }
+
+    function handleStartTitleTap() {
+      if (!ENABLE_EASTER_EGGS) return;
+      easterTapCount += 1;
+      if (easterTapCount >= 7 && !easterGateUnlocked) {
+        easterGateUnlocked = true;
+        localStorage.setItem("mbti_easter_gate", "1");
+        alert("🕳️ 暗门已开启：你已解锁隐藏彩蛋增强模式！");
+      }
+      clearTimeout(handleStartTitleTap._timer);
+      handleStartTitleTap._timer = setTimeout(() => { easterTapCount = 0; }, 2200);
+    }
+
+    function toggleDisplaySettings() {
+      displaySettingsOpen = !displaySettingsOpen;
+      const panel = document.getElementById("display-settings-panel");
+      panel.classList.toggle("open", displaySettingsOpen);
+    }
+
+    function closeDisplaySettings() {
+      displaySettingsOpen = false;
+      const panel = document.getElementById("display-settings-panel");
+      panel.classList.remove("open");
+    }
+
+    function applyThemeMode(theme) {
+      const isNight = theme === "night";
+      document.body.classList.toggle("theme-night", isNight);
+      const btn = document.getElementById("theme-toggle-btn");
+      if (btn) btn.innerText = isNight ? "切换浅色主题" : "切换夜间主题";
+      localStorage.setItem("mbti_theme_mode", isNight ? "night" : "light");
+    }
+
+    function toggleThemeMode() {
+      const isNight = document.body.classList.contains("theme-night");
+      applyThemeMode(isNight ? "light" : "night");
+    }
+
+    function setGlassBlur(value) {
+      const blur = Number(value) || 12;
+      document.documentElement.style.setProperty("--glass-blur", `${blur}px`);
+      const label = document.getElementById("blur-value-label");
+      if (label) label.innerText = String(blur);
+      localStorage.setItem("mbti_glass_blur", String(blur));
+    }
+
+    function initDisplaySettings() {
+      const savedTheme = localStorage.getItem("mbti_theme_mode") || "light";
+      applyThemeMode(savedTheme);
+      const savedBlur = Number(localStorage.getItem("mbti_glass_blur") || "12");
+      const blur = Math.min(24, Math.max(6, savedBlur));
+      const range = document.getElementById("blur-range");
+      if (range) range.value = String(blur);
+      setGlassBlur(blur);
+      document.addEventListener("click", (evt) => {
+        const panel = document.getElementById("display-settings-panel");
+        const fab = document.getElementById("settings-fab");
+        if (!displaySettingsOpen) return;
+        if (!panel.contains(evt.target) && !fab.contains(evt.target)) closeDisplaySettings();
+      });
+    }
+
+    function playResultIntro() {
+      const avatarBox = document.getElementById("avatar-box");
+      if (avatarBox) {
+        avatarBox.classList.remove("intro-pop");
+        void avatarBox.offsetWidth;
+        avatarBox.classList.add("intro-pop");
+      }
+      const nodes = Array.from(document.querySelectorAll("#result-page .result-reveal"));
+      nodes.forEach((el) => el.classList.remove("show"));
+      nodes.forEach((el, idx) => {
+        const delay = 180 + idx * 70;
+        setTimeout(() => el.classList.add("show"), delay);
+      });
+    }
+
+    function getYouthRoast(name, mbti, wdType, isHidden) {
+      if (isHidden) {
+        return `你这波属于「限定皮肤」级人格，主打一个稀有和抽象并存。${name}同款气场一开，日常操作就是把普通日子过成番剧特别篇。友情提示：发疯可以，记得按时吃饭和睡觉。`;
+      }
+      const styleMap = {
+        INTJ: "战略大脑在线，做事喜欢先搭框架再出手",
+        INTP: "脑洞和逻辑都很能打，擅长把问题拆成可解的模块",
+        ENTJ: "目标感极强，天然自带推进器",
+        ENTP: "梗王+点子王，能把会议聊成头脑风暴现场",
+        INFJ: "共情和洞察拉满，擅长看见别人看不到的细节",
+        INFP: "理想感很珍贵，内心世界像一部温柔长番",
+        ENFJ: "氛围担当，团队里最会托举别人状态",
+        ENFP: "灵感来得快，快乐扩散能力一流",
+        ISTJ: "稳健可靠，执行力像定时任务一样准",
+        ISFJ: "照顾力满格，细节处总能给到安全感",
+        ESTJ: "管理天赋明显，擅长把混乱拉回正轨",
+        ESFJ: "社交亲和力强，很会组织和联结",
+        ISTP: "冷静务实，动手解决问题的速度很快",
+        ISFP: "审美和感受力在线，做事有自己的节奏",
+        ESTP: "行动派代表，机会来了就能快速抓住",
+        ESFP: "现场感染力强，能量高、氛围足"
+      };
+      const wdText = wdType === "W" ? "整体偏稳健，抗压时更像冷静运营位。" : "整体偏热血，情绪和行动都很有爆发力。";
+      return `${styleMap[mbti] || "你的人格配置很有记忆点"} ${wdText} 你是那种“平时整活、关键时刻真能顶上去”的年轻人版本主角。`;
+    }
+
+    function getDetailedAnalysis(mbti, wdType, scores) {
+      const energy = scores.E >= scores.I ? "你通过互动回血，和同频的人聊天会快速进入高能状态。" : "你通过独处回血，安静环境能显著提升你的决策质量。";
+      const info = scores.S >= scores.N ? "你更相信可验证的信息，做判断偏向落地和可执行。" : "你更偏向可能性思维，善于从零散线索里拼出新路线。";
+      const decision = scores.T >= scores.F ? "你在关键时刻更重逻辑和效率，处理问题很像项目经理。" : "你在关键时刻更重感受和关系，处理问题很像情绪教练。";
+      const habit = scores.J >= scores.P ? "你偏向先定节奏再行动，计划感会给你带来安全感。" : "你偏向边走边调，灵活和即兴是你的真实战力。";
+      const wd = wdType === "W" ? "W 维度偏高：你稳得住场面，适合当团队里的定海神针。" : "D 维度偏高：你爆发力强，适合在需要突破时担任破局位。";
+      return `${energy} ${info} ${decision} ${habit} ${wd}`;
+    }
+
+    function buildCompatibilityRanking(mbti, wdType, isHidden) {
+      const map = {
+        NT: ["ENTP", "INTJ", "ENTJ", "INTP"],
+        NF: ["ENFP", "INFJ", "INFP", "ENFJ"],
+        SJ: ["ISFJ", "ISTJ", "ESFJ", "ESTJ"],
+        SP: ["ESTP", "ISTP", "ESFP", "ISFP"]
+      };
+      if (isHidden) return [
+        { label: "同频乐子人联盟", score: "99%" },
+        { label: "高能创意搭档", score: "95%" },
+        { label: "稳健兜底队友", score: "91%" }
+      ];
+      const group = mbti[1] + mbti[2];
+      const list = map[group] || [mbti, "ENFP", "ISTJ", "INTP"];
+      return [
+        { label: `${list[0]}（同核队友）`, score: wdType === "W" ? "96%" : "94%" },
+        { label: `${list[1]}（互补加速）`, score: "92%" },
+        { label: `${list[2]}（长期稳定）`, score: "89%" }
+      ];
+    }
+
+    function getChuuniQuote(name, wdType, isHidden) {
+      if (isHidden) return `「当命运读条到 100%，我将以 ${name} 之名重写副本规则。」`;
+      if (wdType === "W") return `「秩序并非枷锁，而是我拔刀前早已写好的胜利脚本。」`;
+      return `「理性只是外壳，热血才是核心引擎——今日起，现实由我点火。」`;
+    }
+
+    const DEFAULT_SHARE_URL = "https://space.bilibili.com/350016742?spm_id_from=333.1387.0.0";
+
+    function getConfiguredShareUrl() {
+      const saved = (localStorage.getItem("mbti_share_url") || "").trim();
+      return saved;
+    }
+
+    function getSafeShareUrl() {
+      const current = window.location.href;
+      const configured = getConfiguredShareUrl();
+      const isLocal = current.startsWith("file://") || current.includes("localhost") || current.includes("127.0.0.1");
+      if (!isLocal && current.startsWith("http")) return current;
+      if (configured.startsWith("http")) return configured;
+      return DEFAULT_SHARE_URL;
+    }
+
+    function configureShareUrl() {
+      const current = getConfiguredShareUrl() || "";
+      const next = prompt("请输入你的线上可访问链接（https://...）", current);
+      if (next === null) return;
+      const value = next.trim();
+      if (!value) {
+        localStorage.removeItem("mbti_share_url");
+        alert("已清空自定义分享链接，将使用默认链接。");
+      } else if (!value.startsWith("http://") && !value.startsWith("https://")) {
+        alert("链接格式不正确，请以 http:// 或 https:// 开头。");
+        return;
+      } else {
+        localStorage.setItem("mbti_share_url", value);
+        alert("分享链接已更新。");
+      }
+      showShareModal();
+    }
+
+    function showShareModal() {
+      const modal = document.getElementById("share-modal");
+      const qrImg = document.getElementById("share-qr-img");
+      const safeUrl = getSafeShareUrl();
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(safeUrl)}&color=ff4d6d`;
+      const previewWrap = document.getElementById("share-character-preview");
+      const previewImg = document.getElementById("share-character-img");
+      const previewName = document.getElementById("share-character-name");
+      if (finalResultData && finalResultData.avatar_id) {
+        previewImg.src = getAvatarSrc(finalResultData.avatar_id);
+        previewName.innerText = `${finalResultData.name} · ${finalResultData.fullType || ""}`;
+        previewWrap.style.display = "block";
+      } else {
+        previewWrap.style.display = "none";
+      }
+      const tipEl = document.getElementById("share-link-tip");
+      const isUsingDefault = safeUrl === DEFAULT_SHARE_URL;
+      tipEl.innerHTML = `${isUsingDefault ? "当前为默认分享链接，可点击设置你自己的站点地址。<br>" : ""}链接：${safeUrl}`;
+      modal.classList.add("show");
+    }
+    function closeShareModal() {
+      document.getElementById("share-modal").classList.remove("show");
+      document.getElementById("copy-btn-text").innerHTML = '<i class="fa-solid fa-link"></i> 一键复制测试链接';
+    }
+    function executeCopy() {
+      const url = getSafeShareUrl();
+      const btn = document.getElementById("copy-btn-text");
+      const copyAction = () => {
+        if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(url);
+        return new Promise((resolve) => {
+          const input = document.createElement("input");
+          input.value = url;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand("copy");
+          document.body.removeChild(input);
+          resolve();
+        });
+      };
+      copyAction().then(() => {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> 链接已成功复制！';
+        setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-link"></i> 一键复制测试链接'; }, 1800);
+      });
+    }
+
+    function startTest() {
+      currentQ = 0;
+      userAnswers.fill(null);
+      switchPage("start-page", "question-page");
+      renderQuestion(false);
+    }
+
+    function renderQuestion(animate = false) {
+      const contentArea = document.getElementById("question-content-area");
+      if (animate) {
+        contentArea.classList.remove("slide-out-left");
+        contentArea.classList.add("slide-in-right");
+        setTimeout(() => contentArea.classList.remove("slide-in-right"), 280);
+      }
+      const q = questionBank[currentQ];
+      document.getElementById("question-text").innerText = q.text;
+      document.getElementById("q-badge").innerText = `Q.${currentQ + 1}`;
+      document.getElementById("progress-text").innerText = `测试进度: ${currentQ + 1} / ${questionBank.length}`;
+      const percent = ((currentQ + 1) / questionBank.length) * 100;
+      document.getElementById("progress-bar").style.width = `${percent}%`;
+      document.getElementById("progress-animal").style.left = `${percent}%`;
+      document.getElementById("btn-prev").disabled = currentQ === 0;
+
+      const container = document.getElementById("options-container");
+      container.innerHTML = "";
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement("div");
+        const isSelected = userAnswers[currentQ] === index;
+        btn.className = `glass-card option-btn ${isSelected ? "selected" : ""}`;
+        const prefixes = ["A", "B", "C"];
+        btn.innerHTML = `<div class="option-prefix">${isSelected ? '<i class="fa-solid fa-check"></i>' : prefixes[index]}</div><div class="option-text">${opt.text}</div>`;
+        btn.onclick = () => selectOption(index);
+        container.appendChild(btn);
+      });
+      updateAnswerCardGrid();
+    }
+
+    function selectOption(optionIndex) {
+      userAnswers[currentQ] = optionIndex;
+      const btns = document.querySelectorAll("#options-container .option-btn");
+      btns.forEach((btn, i) => {
+        if (i === optionIndex) {
+          btn.classList.add("selected");
+          btn.querySelector(".option-prefix").innerHTML = '<i class="fa-solid fa-check"></i>';
+        } else {
+          btn.classList.remove("selected");
+          btn.querySelector(".option-prefix").innerHTML = ["A", "B", "C"][i];
+        }
+      });
+      setTimeout(() => {
+        if (currentQ < questionBank.length - 1) {
+          const contentArea = document.getElementById("question-content-area");
+          contentArea.classList.add("slide-out-left");
+          setTimeout(() => { currentQ++; renderQuestion(true); }, 280);
+        } else {
+          checkAndSubmit();
+        }
+      }, 280);
+    }
+
+    function goToPrev() { if (currentQ > 0) { currentQ--; renderQuestion(); } }
+    function goToQuestion(index) { currentQ = index; toggleAnswerCard(); renderQuestion(); }
+    function toggleAnswerCard() {
+      const overlay = document.getElementById("modal-overlay");
+      overlay.classList.toggle("show");
+      if (overlay.classList.contains("show")) updateAnswerCardGrid();
+    }
+    function updateAnswerCardGrid() {
+      const grid = document.getElementById("ac-grid");
+      grid.innerHTML = "";
+      for (let i = 0; i < questionBank.length; i++) {
+        const item = document.createElement("div");
+        const classes = ["ac-item"];
+        if (userAnswers[i] !== null) classes.push("answered");
+        if (i === currentQ) classes.push("current");
+        item.className = classes.join(" ");
+        item.innerText = i + 1;
+        item.onclick = () => goToQuestion(i);
+        grid.appendChild(item);
+      }
+    }
+
+    function checkAndSubmit() {
+      const firstUnanswered = userAnswers.findIndex((ans) => ans === null);
+      if (firstUnanswered !== -1) {
+        if (document.getElementById("modal-overlay").classList.contains("show")) toggleAnswerCard();
+        alert(`指挥官，第 ${firstUnanswered + 1} 题还没有作答哦！`);
+        goToQuestion(firstUnanswered);
+      } else {
+        if (document.getElementById("modal-overlay").classList.contains("show")) toggleAnswerCard();
+        showLoadingAndCalculate();
+      }
+    }
+    function showLoadingAndCalculate() {
+      document.getElementById("loading-overlay").classList.add("show");
+      setTimeout(() => {
+        calculateResult();
+        document.getElementById("loading-overlay").classList.remove("show");
+      }, 1200);
+    }
+
+    function calculateResult() {
+      const scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0, W:0, D:0 };
+      for (let i = 0; i < questionBank.length; i++) {
+        const optScores = questionBank[i].options[userAnswers[i]].scores;
+        for (const key in optScores) scores[key] += optScores[key];
+      }
+      const diffE = Math.abs(scores.E - scores.I);
+      const diffS = Math.abs(scores.S - scores.N);
+      const diffT = Math.abs(scores.T - scores.F);
+      const diffJ = Math.abs(scores.J - scores.P);
+
+      let mbtiStr = "";
+      let wdType = "";
+      let resultChar = null;
+      let finalTitle = "";
+      let isHiddenTriggered = false;
+
+      if (ENABLE_EASTER_EGGS) {
+        // 默认小概率触发；暗门开启后使用更高概率和更宽条件。
+        const smallChance = Math.random() < 0.035;
+        const gateChance = Math.random() < 0.22;
+        const nearBalanced = (diffE <= 2 || diffS <= 2 || diffT <= 2 || diffJ <= 2);
+        const intenseStyle = (scores.D >= 48 || scores.I >= 22);
+        if (smallChance) isHiddenTriggered = true;
+        else if (easterGateUnlocked && (nearBalanced && gateChance)) isHiddenTriggered = true;
+        else if (easterGateUnlocked && intenseStyle) isHiddenTriggered = true;
+      }
+
+      const titleEl = document.getElementById("result-title-main");
+      if (isHiddenTriggered) {
+        const keys = Object.keys(easterEggs);
+        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+        resultChar = easterEggs[randomKey];
+        finalTitle = "✨ 稀有隐藏款 ✨";
+        wdType = "绝密";
+        titleEl.classList.add("rare");
+      } else {
+        mbtiStr += (scores.E >= scores.I) ? "E" : "I";
+        mbtiStr += (scores.S >= scores.N) ? "S" : "N";
+        mbtiStr += (scores.T >= scores.F) ? "T" : "F";
+        mbtiStr += (scores.J >= scores.P) ? "J" : "P";
+        wdType = (scores.W >= scores.D) ? "W" : "D";
+        resultChar = characterDB[mbtiStr][wdType];
+        finalTitle = `【${resultChar.tag}】`;
+        titleEl.classList.remove("rare");
+      }
+
+      finalResultData = resultChar;
+      finalResultData.fullTitle = finalTitle;
+      finalResultData.fullType = isHiddenTriggered ? "【特殊收容物】" : `【${wdType === "W" ? "稳健派" : "癫狂派"}】`;
+      finalResultData.isHidden = isHiddenTriggered;
+      finalResultData.mbti = isHiddenTriggered ? "HIDDEN" : mbtiStr;
+      finalResultData.wdType = wdType;
+
+      const calcDominantP = (v1, v2) => { const t = v1 + v2; return t === 0 ? 50 : Math.round((Math.max(v1, v2) / t) * 100); };
+      const pE = calcDominantP(scores.E, scores.I);
+      const pS = calcDominantP(scores.S, scores.N);
+      const pT = calcDominantP(scores.T, scores.F);
+      const pJ = calcDominantP(scores.J, scores.P);
+      const pW = calcDominantP(scores.W, scores.D);
+      const radarLabels = [
+        scores.E >= scores.I ? "社交悍匪" : "赛博社恐",
+        scores.S >= scores.N ? "洞察秋毫" : "天马行空",
+        scores.T >= scores.F ? "绝对理智" : "共情大师",
+        scores.J >= scores.P ? "掌控全局" : "随心所欲",
+        scores.W >= scores.D ? "稳如老狗" : "抽象发疯"
+      ];
+      const radarData = [pE, pS, pT, pJ, pW];
+
+      let similarity = 0;
+      if (isHiddenTriggered) similarity = resultChar.avatar_id === 35 ? 100.0 : 99.9;
+      else {
+        let avgP = (pE + pS + pT + pJ + pW) / 500;
+        similarity = 75 + (avgP - 0.5) * 48 + (Math.random() * 1.6 - 0.8);
+        if (similarity > 99.9) similarity = 99.9;
+      }
+      finalResultData.similarity = similarity.toFixed(1) + "%";
+
+      titleEl.innerText = finalTitle;
+      document.getElementById("char-name").innerText = resultChar.name;
+      document.getElementById("char-anime").innerText = resultChar.anime;
+      const simEl = document.getElementById("char-similarity");
+      simEl.innerHTML = `<i class="fa-solid fa-link"></i> 灵魂契合度：${finalResultData.similarity}`;
+      if (isHiddenTriggered) simEl.classList.add("rare"); else simEl.classList.remove("rare");
+      const tagsContainer = document.getElementById("char-hobby-tags");
+      tagsContainer.innerHTML = "";
+      if (resultChar.tags) {
+        resultChar.tags.forEach((tag) => {
+          const span = document.createElement("span");
+          span.className = `hobby-tag ${isHiddenTriggered ? "rare" : ""}`;
+          span.innerText = tag;
+          tagsContainer.appendChild(span);
+        });
+      }
+      const charTagEl = document.getElementById("char-tag");
+      charTagEl.innerText = finalResultData.fullType;
+      if (isHiddenTriggered) charTagEl.classList.add("rare"); else charTagEl.classList.remove("rare");
+      const youthRoast = getYouthRoast(resultChar.name, finalResultData.mbti, wdType, isHiddenTriggered);
+      document.getElementById("char-roast").innerText = youthRoast;
+      finalResultData.displayRoast = youthRoast;
+
+      const detailText = getDetailedAnalysis(finalResultData.mbti, wdType, scores);
+      document.getElementById("detailed-analysis").innerText = detailText;
+      finalResultData.detailText = detailText;
+
+      const rankList = buildCompatibilityRanking(finalResultData.mbti, wdType, isHiddenTriggered);
+      const rankEl = document.getElementById("compatibility-ranking");
+      rankEl.innerHTML = "";
+      rankList.forEach((row, idx) => {
+        const item = document.createElement("div");
+        item.className = "rank-item";
+        item.innerHTML = `<span class="rank-left">TOP ${idx + 1} · ${row.label}</span><span class="rank-right">${row.score}</span>`;
+        rankEl.appendChild(item);
+      });
+      finalResultData.rankList = rankList;
+
+      const chuuni = getChuuniQuote(resultChar.name, wdType, isHiddenTriggered);
+      document.getElementById("chuuni-quote").innerText = chuuni;
+      finalResultData.chuuni = chuuni;
+
+      const avatarBox = document.getElementById("avatar-box");
+      avatarBox.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = getAvatarSrc(resultChar.avatar_id);
+      img.alt = resultChar.name;
+      img.loading = "eager";
+      img.decoding = "async";
+      avatarBox.appendChild(img);
+      finalResultData.avatar_id = resultChar.avatar_id;
+      unlockCharacter(resultChar.avatar_id);
+
+      const chartConfig = (isPoster) => ({
+        type: "radar",
+        data: {
+          labels: radarLabels,
+          datasets: [{
+            data: radarData,
+            backgroundColor: "rgba(255, 126, 179, 0.4)",
+            borderColor: "#ff7eb3",
+            pointBackgroundColor: "#ff4d6d",
+            borderWidth: 2,
+            pointRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: isPoster ? false : { duration: 1000, easing: "easeOutQuart" },
+          scales: {
+            r: {
+              min: 0, max: 100,
+              ticks: { display: false, stepSize: 20 },
+              grid: { color: "rgba(255, 143, 171, 0.25)", circular: true },
+              angleLines: { color: "rgba(255, 143, 171, 0.25)" },
+              pointLabels: {
+                font: { family: "Microsoft YaHei", size: isPoster ? 14 : 12, weight: "bold" },
+                color: "#4a4a4a"
+              }
+            }
+          },
+          plugins: { legend: { display: false }, tooltip: { enabled: !isPoster } }
+        }
+      });
+
+      if (mainRadarChart) mainRadarChart.destroy();
+      if (posterRadarChart) posterRadarChart.destroy();
+      const ctxMain = document.getElementById("mainRadarChart").getContext("2d");
+      mainRadarChart = new Chart(ctxMain, chartConfig(false));
+      const ctxPoster = document.getElementById("posterRadarChart").getContext("2d");
+      posterRadarChart = new Chart(ctxPoster, chartConfig(true));
+
+      switchPage("question-page", "result-page");
+    }
+
+    function switchPage(fromId, toId) {
+      document.getElementById(fromId).classList.remove("active");
+      document.getElementById(toId).classList.add("active");
+      if (toId === "result-page") {
+        playResultIntro();
+      } else {
+        closeDisplaySettings();
+      }
+      window.scrollTo(0, 0);
+    }
+
+    async function generateHTMLPoster() {
+      if (!finalResultData) return;
+      const btn = document.getElementById("btn-generate-poster");
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 正在绘制魔法海报...';
+      btn.disabled = true;
+      try {
+        const titleEl = document.getElementById("poster-main-title");
+        titleEl.innerText = "🔮 2DTI · 测测你的二次元灵魂原型";
+        titleEl.style.color = finalResultData.isHidden ? "#b185db" : "#ff4d6d";
+        document.getElementById("poster-name").innerText = finalResultData.name;
+        document.getElementById("poster-anime").innerText = finalResultData.anime;
+        const posterSimEl = document.getElementById("poster-similarity");
+        posterSimEl.innerText = `🔥 灵魂契合度：${finalResultData.similarity}`;
+        posterSimEl.style.color = finalResultData.isHidden ? "#b185db" : "#ff4d6d";
+        const posterTagsContainer = document.getElementById("poster-hobby-tags");
+        posterTagsContainer.innerHTML = "";
+        if (finalResultData.tags) {
+          finalResultData.tags.forEach((tag) => {
+            const span = document.createElement("span");
+            span.className = `hobby-tag ${finalResultData.isHidden ? "rare" : ""}`;
+            span.innerText = tag;
+            posterTagsContainer.appendChild(span);
+          });
+        }
+        document.getElementById("poster-roast").innerText = "🔥 2DTI 今日嘴替：\n" + (finalResultData.displayRoast || finalResultData.roast);
+
+        const avatarBox = document.getElementById("poster-avatar");
+        avatarBox.innerHTML = "";
+        const avatarSrc = getAvatarSrc(finalResultData.avatar_id);
+        avatarBox.style.backgroundImage = `url("${avatarSrc}")`;
+        avatarBox.style.backgroundRepeat = "no-repeat";
+        avatarBox.style.backgroundPosition = "center";
+        avatarBox.style.backgroundSize = "contain";
+        avatarBox.style.backgroundColor = "#fff";
+        const img = document.createElement("img");
+        img.crossOrigin = "anonymous";
+        img.src = avatarSrc;
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "contain";
+        img.style.opacity = "0";
+        await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+        avatarBox.appendChild(img);
+
+        const qrImg = document.getElementById("poster-qr");
+        qrImg.crossOrigin = "anonymous";
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(getSafeShareUrl())}&color=${finalResultData.isHidden ? "b185db" : "ff4d6d"}`;
+        await new Promise((resolve) => { qrImg.onload = resolve; qrImg.onerror = resolve; });
+
+        await new Promise((r) => setTimeout(r, 240));
+        const canvas = await html2canvas(document.getElementById("poster-capture-area"), {
+          useCORS: true, allowTaint: false, scale: Math.min(2, window.devicePixelRatio || 1.5), backgroundColor: null
+        });
+        document.getElementById("generated-poster-img").src = canvas.toDataURL("image/jpeg", 0.93);
+        document.getElementById("poster-modal").classList.add("show");
+      } catch (e) {
+        console.error(e);
+        alert("⚠️ 海报生成失败。建议通过本地服务器打开（如 Live Server），避免浏览器对跨域资源限制。");
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+    function closePoster() { document.getElementById("poster-modal").classList.remove("show"); }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateHomeUnlockCount();
+      initDisplaySettings();
+      const trigger = document.getElementById("start-title-trigger");
+      if (trigger) trigger.addEventListener("click", handleStartTitleTap);
+      if ("requestIdleCallback" in window) requestIdleCallback(createParticles); else setTimeout(createParticles, 0);
+    });
+</script>
+</body>
+</html>
