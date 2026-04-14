@@ -5,6 +5,7 @@
 一个轻量、有趣、基于 SBTI 赋分机制的二次元人格测试。只需 3 分钟，30 道情景题，找到专属于你的二次元灵魂！
 
 https://2dti-model-p5zbmxhn.edgeone.cool/
+https://2dti.asia/
 
 ## ✨ 特点
 
@@ -18,7 +19,7 @@ https://2dti-model-p5zbmxhn.edgeone.cool/
 ## 🚀 在线体验
 
 👉 **立即测试**：https://2dti-model-p5zbmxhn.edgeone.cool/
-🔮 *（自定义域名即将上线）*
+或 https://2dti.asia/
 
 ## 🛠️ 技术栈
 
