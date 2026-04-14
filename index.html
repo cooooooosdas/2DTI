@@ -6,9 +6,9 @@
     <title>2DTI - 次元人格测试</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script defer src="./imagesBase64.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./imagesBase64.js"></script>
     <style>
         :root {
             --bg-gradient-1: #f7f0ff;
@@ -286,22 +286,10 @@
         .radar-container { position: relative; width: 100%; height: 220px; display: flex; justify-content: center; }
         .brand-slogan { text-align: center; color: var(--text-sub); font-size: 12px; font-weight: bold; margin-bottom: 14px; }
         .display-settings {
-            position: fixed;
-            right: 14px;
-            bottom: calc(18px + env(safe-area-inset-bottom));
-            z-index: 1200;
-            width: 210px;
-            background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.85);
-            border-radius: 14px;
-            box-shadow: var(--shadow-md);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            padding: 10px;
-            transform: translateY(8px) scale(0.98);
-            opacity: 0;
-            pointer-events: none;
-            transition: var(--transition);
+            position: fixed; right: 14px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 1200;
+            width: 210px; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.85); border-radius: 14px;
+            box-shadow: var(--shadow-md); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            padding: 10px; transform: translateY(8px) scale(0.98); opacity: 0; pointer-events: none; transition: var(--transition);
         }
         .display-settings.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
         .display-settings-title { font-size: 12px; font-weight: 900; color: var(--accent); margin-bottom: 8px; }
@@ -309,45 +297,19 @@
         .settings-row:last-child { margin-bottom: 2px; }
         .settings-label { font-size: 12px; color: var(--text-sub); margin-bottom: 4px; display: block; font-weight: bold; }
         .settings-toggle {
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--accent), var(--primary));
-            color: #fff;
-            padding: 8px 10px;
-            font-size: 12px;
-            font-weight: 900;
-            cursor: pointer;
+            width: 100%; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: #fff; padding: 8px 10px; font-size: 12px; font-weight: 900; cursor: pointer;
         }
         .settings-range { width: 100%; accent-color: var(--accent); }
         .settings-btn {
-            position: fixed;
-            right: 14px;
-            bottom: calc(18px + env(safe-area-inset-bottom));
-            z-index: 1201;
-            width: 46px;
-            height: 46px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.9);
-            background: linear-gradient(135deg, var(--accent), var(--primary));
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            box-shadow: var(--shadow-md);
+            position: fixed; right: 14px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 1201;
+            width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.9);
+            background: linear-gradient(135deg, var(--accent), var(--primary)); color: #fff; font-size: 18px; cursor: pointer; box-shadow: var(--shadow-md);
         }
         .settings-btn.hidden { opacity: 0; pointer-events: none; }
-        .result-reveal {
-            opacity: 0;
-            transform: translateY(14px) scale(0.98);
-            transition: opacity .42s ease, transform .42s ease;
-        }
-        .result-reveal.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        .avatar-box.intro-pop {
-            animation: avatarIntro .58s cubic-bezier(0.2, 1, 0.3, 1) both;
-        }
+        .result-reveal { opacity: 0; transform: translateY(14px) scale(0.98); transition: opacity .42s ease, transform .42s ease; }
+        .result-reveal.show { opacity: 1; transform: translateY(0) scale(1); }
+        .avatar-box.intro-pop { animation: avatarIntro .58s cubic-bezier(0.2, 1, 0.3, 1) both; }
         @keyframes avatarIntro {
             0% { opacity: 0; transform: translateY(12px) scale(0.72); }
             70% { opacity: 1; transform: translateY(-3px) scale(1.04); }
@@ -390,14 +352,14 @@
             <p style="font-weight:bold; color:var(--primary-hover); margin-bottom:8px;">基于赛博心理学与抽象梗学</p>
             <p>测绘你的灵魂纯度！包含经典四维与隐藏第五维度。</p>
             <p style="margin-top: 10px; background: #fff; padding: 8px; border-radius:8px; display:inline-block;"><b style="color:var(--accent)">【W稳如老狗 / D癫狂发疯】</b></p>
-            <p style="margin-top: 10px; font-size:13px; font-weight:bold; color: var(--accent);">32种形态 + 3个深渊彩蛋。</p>
+            <p style="margin-top: 10px; font-size:13px; font-weight:bold; color: var(--accent);">31种形态 + 3个深渊彩蛋。</p>
         </div>
         <div class="btn-group-row">
             <button class="btn-primary" onclick="startTest()"><i class="fa-solid fa-gamepad"></i> 建立神经连接</button>
             <button class="btn-outline" onclick="showShareModal()"><i class="fa-solid fa-paper-plane"></i> 召唤次元搭子</button>
         </div>
         <div style="margin-top: 18px; font-size: 13px; color: var(--text-sub); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; font-weight: bold;" onclick="openArchiveModal()">
-            <i class="fa-solid fa-book-journal-whills"></i> 📜 2DTI 图鉴：已收集 <span id="home-unlock-count">0</span>/<span id="home-total-count">32</span>
+            <i class="fa-solid fa-book-journal-whills"></i> 📜 2DTI 图鉴：已收集 <span id="home-unlock-count">0</span>/<span id="home-total-count">31</span>
         </div>
     </div>
 
@@ -438,7 +400,7 @@
     <div id="archive-modal" class="modal-overlay" style="z-index: 1000;">
         <div class="answer-card-modal" style="max-width: 440px;">
             <div class="ac-header">
-                <span class="ac-title" style="margin:0 auto; padding-left: 36px;">📜 2DTI 图鉴 (<span id="modal-unlock-count">0</span>/<span id="modal-total-count">32</span>)</span>
+                <span class="ac-title" style="margin:0 auto; padding-left: 36px;">📜 2DTI 图鉴 (<span id="modal-unlock-count">0</span>/<span id="modal-total-count">31</span>)</span>
                 <button class="ac-close" onclick="closeArchiveModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="archive-grid" id="archive-grid"></div>
@@ -563,13 +525,13 @@
 
     const questionBank = [
       { text: "在漫展碰到极其逆天的Cosplay（比如cos原石、马桶），你的真实反应是？", options: [
-        { text: "直接冲上去跪求合影！高呼一声义父！转头就在朋友圈发九宫格疯狂炫耀。", scores: { E: 2, I: 0, W: 0, D: 2 } },
+        { text: "直接冲上去跪求合影！集邮天下第一！回去就发朋友圈九宫格炫耀", scores: { E: 2, I: 0, W: 0, D: 2 } },
         { text: "远远地掏出手机偷拍个背影，发给基友：“快看，活的野生赛博精神病。”", scores: { E: 0, I: 2, W: 1, D: 1 } },
-        { text: "脚趾瞬间抓地，低头假装玩手机，一边觉得弱智一边加快脚步光速逃离现场。", scores: { E: 1, I: 1, W: 2, D: 0 } }
+        { text: "脚趾瞬间构筑出四室一厅，一边觉得弱智一边加快脚步光速逃离现场。", scores: { E: 1, I: 1, W: 2, D: 0 } }
       ]},
       { text: "游戏大厅里遇到社牛队友开麦放震耳欲聋的土味DJ，你？", options: [
         { text: "遇强则强！果断开麦放《好日子》或者大悲咒跟他激情对狙，决战紫禁之巅！", scores: { E: 2, I: 0, W: 0, D: 2 } },
-        { text: "卑微地敲键盘打字：“大哥，歌挺好听就是太费耳朵了，能稍微关一下吗？”", scores: { E: 1, I: 1, W: 2, D: 0 } },
+        { text: "卑微地敲键盘打字：“大哥，你的麦很炸🐴，能稍微关一下吗？”", scores: { E: 1, I: 1, W: 2, D: 0 } },
         { text: "熟练地点开计分板，点击静音加举报一条龙。内心毫无波澜，甚至还有点想笑。", scores: { E: 0, I: 2, W: 1, D: 1 } }
       ]},
       { text: "被朋友强行拉去饭局，一推门全是现充，你的状态：", options: [
@@ -579,7 +541,7 @@
       ]},
       { text: "走路上被街头UP主怼脸采访：“你的二次元老婆/老公是谁？”", options: [
         { text: "瞬间化身传教士！对着镜头狂吹我推的神仙颜值和绝美剧情，口沫横飞停不下来。", scores: { E: 2, I: 0, W: 0, D: 2 } },
-        { text: "随便报个大众都知道的名字（比如名侦探柯南）糊弄过去，主打一个安全下车。", scores: { E: 1, I: 1, W: 2, D: 0 } },
+        { text: "随便报个名字糊弄过去，主打一个安全下车。", scores: { E: 1, I: 1, W: 2, D: 0 } },
         { text: "眼神躲闪连连摆手，嘴里嘟囔着“对不起我没听懂”，像躲高利贷一样逃走。", scores: { E: 0, I: 2, W: 1, D: 1 } }
       ]},
       { text: "一个人吃火锅中途想去上厕所，你的心理活动：", options: [
@@ -598,19 +560,19 @@
         { text: "冷笑一声：“就这？”果断点右上角退出，并且把这个制作组永久拉进黑名单。", scores: { S: 1, N: 1, W: 2, D: 0 } }
       ]},
       { text: "听到网上有人大喊“原神，启动！”时，你的脑回路：", options: [
-        { text: "DNA狠狠动了！脑海里自动浮现出那扇洁白的大门和自己干瘪的钱包。", scores: { S: 2, N: 0, W: 2, D: 0 } },
+        { text: "DNA狠狠动了！脑海里自动浮现出那扇洁白的大门，我派蒙忘喂了我回去一下。", scores: { S: 2, N: 0, W: 2, D: 0 } },
         { text: "开始进行深度的哲学思考：这个梗究竟为什么会火？它反映了怎样的时代精神？", scores: { S: 0, N: 2, W: 1, D: 1 } },
-        { text: "不管三七二十一，直接接上一句“启动！”。反正大家都在乐，我也跟着乐就完事了。", scores: { S: 1, N: 1, W: 0, D: 2 } }
+        { text: "不管三七二十一，直接接上一句“启动！”打不过就加入。", scores: { S: 1, N: 1, W: 0, D: 2 } }
       ]},
       { text: "如果异世界转生，你最想带什么金手指？", options: [
-        { text: "能看血条和经验值的系统面板。稳扎稳打刷怪掉装备，这才是男人的浪漫！", scores: { S: 2, N: 0, W: 2, D: 0 } },
-        { text: "极其抽象的因果律技能。哪怕偶尔会坑到自己，只要够花里胡哨、脑洞够大就行！", scores: { S: 0, N: 2, W: 0, D: 2 } },
+        { text: "能看血条和经验值的系统面板。稳扎稳打刷怪掉装备，这才是人类的浪漫！", scores: { S: 2, N: 0, W: 2, D: 0 } },
+        { text: "极其抽象的因果律技能。哪怕偶尔会坑到自己，这是动漫男主的必修课", scores: { S: 0, N: 2, W: 0, D: 2 } },
         { text: "我不求无敌，只求给我一个装满了肥宅快乐水、炸鸡和无限WIFI的异次元随身别墅。", scores: { S: 1, N: 1, W: 1, D: 0 } }
       ]},
       { text: "半夜两点睡不着躺在床上，脑子里通常在想什么？", options: [
         { text: "如果明天丧尸病毒突然爆发，厨房里的泡面能撑几天？用平底锅爆头顺手吗？", scores: { S: 0, N: 2, W: 0, D: 2 } },
         { text: "明早闹钟定了吗？花呗下个月要还多少？晚上这顿夜宵是不是点得太贵了？", scores: { S: 2, N: 0, W: 2, D: 0 } },
-        { text: "深夜社死反刍大会：五年前亲戚过年问我话时，我那句回答简直太逊了啊啊啊！", scores: { S: 1, N: 1, W: 0, D: 2 } }
+        { text: "深夜反刍大会：如果当初...", scores: { S: 1, N: 1, W: 0, D: 2 } }
       ]},
       { text: "你推的角色突然成了毁灭世界的反派，你：", options: [
         { text: "理智彻底崩盘：“策划脑子进水了？这人设碎了一地！爷不伺候了，直接退坑！”", scores: { T: 2, F: 0, W: 2, D: 0 } },
@@ -620,7 +582,7 @@
       { text: "你抽卡全保底，群友发了“单抽双黄”图骑脸，你：", options: [
         { text: "推了推眼镜，冷漠地甩出一张正态分布图，试图用冰冷的概率论摧毁他的优越感。", scores: { T: 2, F: 0, W: 1, D: 1 } },
         { text: "瞬间化身阴暗爬行的嫉妒怪！在群里狂发流泪猫猫头和“杀杀杀”表情包。", scores: { T: 0, F: 2, W: 0, D: 2 } },
-        { text: "表面大度地发个“沾沾仙气”，实则后槽牙已经咬碎，默默画圈圈诅咒他小保底必歪。", scores: { T: 1, F: 1, W: 2, D: 0 } }
+        { text: "表面大度地发个“沾沾欧气”，实则后槽牙已经咬碎，默默画圈圈诅咒他小保底必歪。", scores: { T: 1, F: 1, W: 2, D: 0 } }
       ]},
       { text: "好基友半夜发Emo朋友圈抱怨生活，你第一反应：", options: [
         { text: "职业病发作。直接在脑内帮他画思维导图分析利弊，试图提供最优的解决方案。", scores: { T: 2, F: 0, W: 2, D: 0 } },
@@ -645,19 +607,19 @@
       { text: "你的电脑桌面或游戏背包通常是什么状态？", options: [
         { text: "极其舒适的强迫症。文件按颜色、首字母、重要程度分门别类，整齐得像件艺术品。", scores: { J: 2, P: 0, W: 2, D: 0 } },
         { text: "彻头彻尾的赛博垃圾站。满屏“新建文件夹(1)”和乱码截图，找东西全靠全局搜索。", scores: { J: 0, P: 2, W: 0, D: 2 } },
-        { text: "表面上看起来光鲜亮丽，但只要你不点开那个名为“杂件”的深渊文件夹，一切都很美好。", scores: { J: 1, P: 1, W: 1, D: 1 } }
+        { text: "表面上看起来光鲜亮丽，但只要你不点开那个名为“杂件”的无底洞文件夹，一切都很美好。", scores: { J: 1, P: 1, W: 1, D: 1 } }
       ]},
       { text: "关于长周期工作或寒暑假作业，你通常怎么搞定？", options: [
         { text: "早就建好了完美的进度表，每天雷打不动做10%，死线前甚至还有空喝杯下午茶。", scores: { J: 2, P: 0, W: 2, D: 0 } },
         { text: "前期疯狂装死，直到死线前24小时才化身八爪鱼，一边爆哭一边创造奇迹！", scores: { J: 0, P: 2, W: 0, D: 2 } },
         { text: "刚开始跟打了鸡血一样猛干两天，然后名正言顺地摸鱼半个月，最后几天随便糊弄交差。", scores: { J: 1, P: 1, W: 1, D: 0 } }
       ]},
-      { text: "写同人文或剪视频，你的过程是：", options: [
+      { text: "假如你要去写同人文或剪视频，你的过程是：", options: [
         { text: "步步为营。写好万字大纲，分镜画得明明白白，像个精准的外科医生一样推进。", scores: { J: 2, P: 0, W: 2, D: 0 } },
         { text: "灵感狂飙！大半夜突然触电般跳起来直接开搞，写到哪算哪，大纲全都是狗屁！", scores: { J: 0, P: 2, W: 0, D: 2 } },
         { text: "有个大概的想法，但中途经常因为刷手机跑偏，最后的成品和最初的想法毫不相干。", scores: { J: 1, P: 1, W: 1, D: 0 } }
       ]},
-      { text: "对于“计划赶不上变化”，你在生活中更倾向：", options: [
+      { text: "对于“计划赶不上变化”，如果有一天突然停电，你在生活中更倾向：", options: [
         { text: "狂怒状态！我已经规划好了完美的周末安排，你告诉我停电？烦躁得想砸东西！", scores: { J: 2, P: 0, W: 1, D: 1 } },
         { text: "简直是狂喜！停电了？太好了！终于有理由名正言顺地躺在床上发呆做白日梦了！", scores: { J: 0, P: 2, W: 0, D: 2 } },
         { text: "只是长长地叹了一口气。默默掏出手机看还有多少电，然后考虑要不要去外面网吧包宿。", scores: { J: 1, P: 1, W: 2, D: 0 } }
@@ -675,7 +637,7 @@
       { text: "如果有魔法，你更倾向用来：", options: [
         { text: "别搞那些虚的，立刻给我变出一座金山和几套房！马上宣布退休，实现财富自由躺平！", scores:{T:2,F:0,W:2,D:0} },
         { text: "我要消除世界上所有的战争和疾病！或者强行施法把那些意难平的CP死死锁在一起！", scores:{T:0,F:2,W:0,D:2} },
-        { text: "什么大事都不想干，只想用来洗碗扫地，以及每天早上卡点瞬移去公司打卡防迟到。", scores:{T:1,F:1,W:1,D:0} }
+        { text: "什么大事都不想干，只想用来洗碗扫地，以及每天早上卡点瞬移去公司打卡防迟到。（给你魔法是让你这样用的啊喂）", scores:{T:1,F:1,W:1,D:0} }
       ]},
       { text: "去完全陌生的城市旅游：", options: [
         { text: "化身特种兵导游。Excel表格精确到分钟，连午饭吃什么菜、上哪个厕所都安排得明明白白。", scores:{J:2,P:0,W:2,D:0} },
@@ -685,7 +647,7 @@
       { text: "遇到极度离谱的网络杠精时：", options: [
         { text: "键盘瞬间冒出火星子！全程不带一个脏字，用极其犀利的阴阳怪气和他大战三百回合！", scores:{E:2,I:0,W:0,D:2} },
         { text: "觉得跟这种生物多说一句话都是在浪费阳寿。直接一套拉黑、举报、屏蔽的连招保平安。", scores:{E:0,I:2,W:2,D:0} },
-        { text: "懒得打字长篇大论，直接回一句“啊对对对你说的都对”，然后关掉手机想象他气急败坏的样子。", scores:{E:1,I:1,W:0,D:2} }
+        { text: "懒得打字长篇大论，直接回一句“啊对对对”，然后关掉手机想象他气急败坏的样子。", scores:{E:1,I:1,W:0,D:2} }
       ]},
       { text: "对“命运”的看法是：", options: [
         { text: "我命由我不由天！什么狗屁命运，我只相信每个月到账的工资卡和我自己肝出来的经验值。", scores:{S:2,N:0,W:2,D:0} },
@@ -695,7 +657,7 @@
       { text: "别人夸你的时候，内心真实想法：", options: [
         { text: "表面不动声色，内心疯狂拉响警报，冷静分析这人是不是想找我借钱或者准备把锅甩给我？", scores:{T:2,F:0,W:2,D:0} },
         { text: "表面疯狂摆手连说“没有没有”，其实心里在猛开香槟，恨不得拿录音笔录下来每天循环播放。", scores:{T:0,F:2,W:0,D:2} },
-        { text: "极度的手足无措。尴尬得脚趾在鞋里疯狂抠地，不知道手往哪放，只能发出几声诡异的傻笑。", scores:{T:1,F:1,W:1,D:1} }
+        { text: "极度的手足无措。这时候应该笑么不应该笑么应该笑么，最后发出几声诡异的傻笑。", scores:{T:1,F:1,W:1,D:1} }
       ]},
       { text: "游戏里拿到极为稀有的珍贵道具：", options: [
         { text: "死死锁在背包最深处！哪怕一直打到大结局，主角都被BOSS打死了我都绝对舍不得拿出来用！", scores:{J:2,P:0,W:1,D:1} },
@@ -721,7 +683,7 @@
       ENTP: { W: { avatar_id: 24, name: "夜神月", anime: "《死亡笔记》", tag: "新世界的神", tags: ["#诡辩王者", "#腹黑怪", "#计划通"], roast: "『你们这些凡人，根本不懂我的高级幽默。』智商全点在了诡辩和抬杠上，一天不找人吵架浑身难受。表面上是个光鲜亮丽的好青年，背地里却是个随时准备写《死亡笔记》的腹黑怪。别太自信了，迟早有一天翻车在自己的嘴贱上。" }, D: { avatar_id: 25, name: "五条悟", anime: "《咒术回战》", tag: "天上天下唯我独癫", tags: ["#宇宙级乐子人", "#精神状态超前", "#最强癫公"], roast: "『只要我不尴尬，尴尬的就是全世界！』宇宙级乐子人，精神状态领先人类五百年。日常操作是在别人的雷区上疯狂蹦迪，还觉得自己帅呆了。你不仅是个癫公/癫婆，还是个实力强劲的癫公/癫婆，让人恨得牙痒痒又干不掉你。" } },
       INFJ: { W: { avatar_id: 26, name: "宇智波鼬", anime: "《火影忍者》", tag: "背负一切的弟控", tags: ["#悲剧主角", "#究极弟控", "#圣母光环"], roast: "『我背负的可是整个宇宙的重量。』悲剧主角综合征晚期。天天觉得自己是个为了大局牺牲小我的圣母，其实就是太喜欢把什么屁事都往自己身上揽。少给自己加戏了，地球没你照样转，赶紧去睡个好觉放下你那该死的救世主情结吧！" }, D: { avatar_id: 27, name: "晓美焰", anime: "《魔法少女小圆》", tag: "轮回系病娇", tags: ["#纯爱战神", "#疯批病娇", "#重度缺爱"], roast: "『为了你，就算让我变成疯批也在所不惜！』纯爱战神应声倒地！表面上是个高冷理智的男神/女神，内心其实是个极度缺爱的疯批病娇。一旦认定了谁，就算把世界炸了也要把他绑在身边。建议立刻下载国家反诈中心，你太容易被骗了。" } },
       INFP: { W: { avatar_id: 28, name: "夏目贵志", anime: "《夏目友人帐》", tag: "温柔神明", tags: ["#脆皮玻璃心", "#眼泪水龙头", "#治愈系天使"], roast: "『今天的一阵风，又让我感伤了半小时。』脆皮玻璃心，泪腺发达程度堪比水龙头。看到路边一棵草都能脑补出一出五十集的虐心大戏。你太温柔了，温柔到总是委屈自己成全别人。快醒醒吧！这世界是个巨大的草台班子，该发疯时就发疯！" }, D: { avatar_id: 29, name: "碇真嗣", anime: "《新世纪福音战士》", tag: "脆皮心碎小狗", tags: ["#内耗大王", "#退堂鼓专家", "#需要鸡血"], roast: "『都是我的错...我不干了...让我走...』内耗大王，退堂鼓国家级演奏家。遇到困难的第一反应是“我不行我不行”，然后缩进被窝里阴暗地画圈圈。你的心理防线比薯片还脆，需要每天被人强行注入八百毫升鸡血才能勉强活下去。" } },
-      ENFJ: { W: { avatar_id: 30, name: "欧尔麦特", anime: "《我的英雄学院》", tag: "和平的象征", tags: ["#正能量发电机", "#救世主执念", "#过度操心"], roast: "『只要看到我，一切就都没问题了！』行走的正能量发电机，随时随地准备给别人打满鸡血。你对拯救世界的执念已经到了病态的地步，看到谁不开心都想冲上去给个拥抱。但老实说，你这副热情过头的样子有时候真的挺吓人的。" }, D: { avatar_id: 31, name: "炼狱杏寿郎", anime: "《鬼灭之刃》", tag: "燃烧的大哥", tags: ["#热血笨蛋", "#爆炸瓦斯桶", "#嗓门超大"], roast: "『燃烧吧！燃烧吧！直到把你我都烧成灰烬！』热血笨蛋，嗓门大到能震碎玻璃。你就像个随时都在爆炸边缘的瓦斯桶，只要有人给你一个火星，你就能当场燃尽自己照亮别人。建议随身携带降压药，小心哪天真的因为太激动而脑血管破裂。" } },
+      ENFJ: { W: { avatar_id: 31, name: "炼狱杏寿郎", anime: "《鬼灭之刃》", tag: "燃烧的大哥", tags: ["#热血笨蛋", "#爆炸瓦斯桶", "#嗓门超大"], roast: "『燃烧吧！燃烧吧！直到把你我都烧成灰烬！』热血笨蛋，嗓门大到能震碎玻璃。你就像个随时都在爆炸边缘的瓦斯桶，只要有人给你一个火星，你就能当场燃尽自己照亮别人。建议随身携带降压药，小心哪天真的因为太激动而脑血管破裂。" }, D: { avatar_id: 31, name: "炼狱杏寿郎", anime: "《鬼灭之刃》", tag: "燃烧的大哥", tags: ["#热血笨蛋", "#爆炸瓦斯桶", "#嗓门超大"], roast: "『燃烧吧！燃烧吧！直到把你我都烧成灰烬！』热血笨蛋，嗓门大到能震碎玻璃。你就像个随时都在爆炸边缘的瓦斯桶，只要有人给你一个火星，你就能当场燃尽自己照亮别人。建议随身携带降压药，小心哪天真的因为太激动而脑血管破裂。" } },
       ENFP: { W: { avatar_id: 32, name: "宫园薰", anime: "《四月是你的谎言》", tag: "燃烧生命的恒星", tags: ["#浪漫主义", "#三分钟热度", "#闪闪发光"], roast: "『不管明天会怎样，今天都要开心啊！』无可救药的浪漫主义者，永远都在追逐下一个闪闪发光的目标。你就像一阵抓不住的风，给别人带来快乐后又迅速跑路。你的三分钟热度简直让人叹为观止，这辈子买的最多的东西可能就是吃灰的装备。" }, D: { avatar_id: 33, name: "虎杖悠仁", anime: "《咒术回战》", tag: "吃手指的阳光大男孩", tags: ["#究极多动症", "#社交悍匪", "#清澈的愚蠢"], roast: "『哇塞！那个是什么！好酷！我也要玩！』究极多动症，哈士奇转世。你的精力旺盛到让人怀疑是不是偷偷吃了兴奋剂，跟谁都能称兄道弟，毫无社交距离感。你那清澈的愚蠢总能拯救气氛，但也经常因为不带脑子而闯出惊天大祸。" } },
       ISTJ: { W: { avatar_id: 34, name: "七海建人", anime: "《咒术回战》", tag: "准点下班狂魔", tags: ["#打工机器", "#规矩就是命", "#靠谱老爹"], roast: "『下班时间到了，多说一个字都要收加班费。』莫得感情的打工机器，规矩就是你的命。你对那些不守规矩的乐子人深恶痛绝，每天最大的愿望就是世界和平、准点下班。虽然嘴上天天抱怨，但真出了事你绝对是一边骂骂咧咧一边收拾烂摊子的爹。" }, D: { avatar_id: 35, name: "伏黑惠", anime: "《咒术回战》", tag: "摇人召唤师", tags: ["#暴躁老哥", "#双标王者", "#同归于尽"], roast: "『烦死了，全都毁灭吧，我只救我想救的人。』表面是个稳重靠谱的高冷男神/女神，其实骨子里是个随时准备掀桌子的暴躁老哥/老姐。你有一套极其自我的双标准则，谁敢碰你的底线，你绝对会拉着他一起下地狱，连骨灰都不给他留。" } },
       ISFJ: { W: { avatar_id: 1, name: "薇尔莉特", anime: "《紫罗兰永恒花园》", tag: "自动手记人偶", tags: ["#无私奉献", "#天生操心命", "#究极老好人"], roast: "『我会完美地执行您的每一个指令。』毫无保留的奉献者，你的存在仿佛就是为了给别人当妈/爹。你太习惯于听从命令和照顾别人了，以至于常常忘记自己也需要被照顾。是个容易被渣男/白眼狼吃干抹净还要帮着数钱的究极老好人。" }, D: { avatar_id: 2, name: "我妻由乃", anime: "《未来日记》", tag: "病娇鼻祖", tags: ["#护食狂魔", "#掏柴刀", "#病娇祖师爷"], roast: "『如果有谁敢靠近你，我就把他大卸八块~』病娇界的祖师爷。平时看着温温柔柔贤良淑德，一旦触碰了你的“专属物”，立刻触发狂暴模式，从裙底掏出柴刀。你那极度扭曲的占有欲简直让人头皮发麻，绝对是这辈子最不能惹的狠角色。" } },
@@ -750,14 +712,25 @@
     const SHOW_EASTER_EGGS_IN_ARCHIVE = false;
     let easterTapCount = 0;
     let easterGateUnlocked = localStorage.getItem("mbti_easter_gate") === "1";
-    const allCharactersList = [];
+    
+    // 动态提取唯一的 31 个常规角色
+    const uniqueCharsMap = new Map();
     for (const type in characterDB) {
-      allCharactersList.push({ type, wd: "W", ...characterDB[type].W });
-      allCharactersList.push({ type, wd: "D", ...characterDB[type].D });
+        if (!uniqueCharsMap.has(characterDB[type].W.avatar_id)) {
+            uniqueCharsMap.set(characterDB[type].W.avatar_id, { type, wd: "W", ...characterDB[type].W });
+        }
+        if (!uniqueCharsMap.has(characterDB[type].D.avatar_id)) {
+            uniqueCharsMap.set(characterDB[type].D.avatar_id, { type, wd: "D", ...characterDB[type].D });
+        }
     }
     if (ENABLE_EASTER_EGGS && SHOW_EASTER_EGGS_IN_ARCHIVE) {
-      for (const key in easterEggs) allCharactersList.push({ type: "???", wd: "?", ...easterEggs[key] });
+        for (const key in easterEggs) {
+            if (!uniqueCharsMap.has(easterEggs[key].avatar_id)) {
+                uniqueCharsMap.set(easterEggs[key].avatar_id, { type: "???", wd: "?", ...easterEggs[key] });
+            }
+        }
     }
+    const allCharactersList = Array.from(uniqueCharsMap.values());
     allCharactersList.sort((a, b) => a.avatar_id - b.avatar_id);
     const TOTAL_CHAR_COUNT = allCharactersList.length;
 
@@ -789,7 +762,7 @@
       grid.innerHTML = "";
       allCharactersList.forEach((char) => {
         const isUnlocked = validUnlocked.includes(char.avatar_id);
-        const isRare = char.avatar_id > 32;
+        const isRare = [15, 16, 17].includes(char.avatar_id);
         const item = document.createElement("div");
         item.className = `archive-item ${isUnlocked ? "" : "locked"} ${isRare && isUnlocked ? "rare" : ""}`;
         const avatarBox = document.createElement("div");
@@ -1050,7 +1023,8 @@
       const q = questionBank[currentQ];
       document.getElementById("question-text").innerText = q.text;
       document.getElementById("q-badge").innerText = `Q.${currentQ + 1}`;
-      document.getElementById("progress-text").innerText = `测试进度: ${currentQ + 1} / ${questionBank.length}`;
+      document.getElementById("progress-text").innerText = `1 / 30`;
+      document.getElementById("progress-text").innerText = `${currentQ + 1} / ${questionBank.length}`;
       const percent = ((currentQ + 1) / questionBank.length) * 100;
       document.getElementById("progress-bar").style.width = `${percent}%`;
       document.getElementById("progress-animal").style.left = `${percent}%`;
@@ -1152,11 +1126,10 @@
       let isHiddenTriggered = false;
 
       if (ENABLE_EASTER_EGGS) {
-        // 默认小概率触发；暗门开启后使用更高概率和更宽条件。
         const smallChance = Math.random() < 0.035;
         const gateChance = Math.random() < 0.22;
         const nearBalanced = (diffE <= 2 || diffS <= 2 || diffT <= 2 || diffJ <= 2);
-        const intenseStyle = (scores.D >= 48 || scores.I >= 22);
+        const intenseStyle = (scores.D >= 48 || scores.I >= 13); // Adjusted I threshold
         if (smallChance) isHiddenTriggered = true;
         else if (easterGateUnlocked && (nearBalanced && gateChance)) isHiddenTriggered = true;
         else if (easterGateUnlocked && intenseStyle) isHiddenTriggered = true;
@@ -1204,7 +1177,7 @@
       const radarData = [pE, pS, pT, pJ, pW];
 
       let similarity = 0;
-      if (isHiddenTriggered) similarity = resultChar.avatar_id === 35 ? 100.0 : 99.9;
+      if (isHiddenTriggered) similarity = resultChar.avatar_id === 17 ? 100.0 : 99.9;
       else {
         let avgP = (pE + pS + pT + pJ + pW) / 500;
         similarity = 75 + (avgP - 0.5) * 48 + (Math.random() * 1.6 - 0.8);
